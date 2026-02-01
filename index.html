@@ -20,19 +20,12 @@
         .btn-confirm { background: #34495e; color: white; }
         .btn-next { background: #e67e22; color: white; }
         
-        /* 誓約画面用スタイル */
         #authPage { text-align: center; padding: 30px 20px; }
-        .checkbox-container { 
-            display: flex; align-items: center; justify-content: center; 
-            gap: 15px; margin: 25px 0; background: #fff5f5; padding: 20px; border-radius: 10px; border: 1px solid #ffcccc;
-        }
+        .checkbox-container { display: flex; align-items: center; justify-content: center; gap: 15px; margin: 25px 0; background: #fff5f5; padding: 20px; border-radius: 10px; border: 1px solid #ffcccc; }
         #authCheck { width: 30px; height: 30px; cursor: pointer; }
         .auth-label { font-size: 1.1rem; font-weight: bold; color: #c0392b; cursor: pointer; }
 
-        #captureArea { 
-            background: white; padding: 20px; width: 360px; height: 640px; 
-            margin: 0 auto; box-sizing: border-box; display: flex; flex-direction: column; position: relative; overflow: hidden;
-        }
+        #captureArea { background: white; padding: 20px; width: 360px; height: 640px; margin: 0 auto; box-sizing: border-box; display: flex; flex-direction: column; position: relative; overflow: hidden; }
         table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
         th, td { border: 1px solid #ccc; padding: 3px; text-align: center; font-size: 0.75rem; }
         th { background: #eee; }
@@ -41,7 +34,7 @@
         #inputPage, #confirmPage, #imageResultPage { display: none; }
         .hidden { display: none; }
         .result-img { width: 100%; max-width: 360px; border: 2px solid #333; margin-top: 10px; }
-        .guide-box { font-size: 0.8rem; background: #fff3e0; padding: 10px; border-radius: 8px; border: 1px solid #e67e22; margin-bottom: 10px; }
+        .guide-box { font-size: 0.85rem; background: #f0f4f8; padding: 12px; border-radius: 8px; border: 1px solid #34495e; margin-bottom: 10px; line-height: 1.5; }
         .caution-text { font-size: 0.7rem; color: #d35400; font-weight: bold; margin-top: 4px; }
     </style>
 </head>
@@ -61,7 +54,7 @@
     <h1>帰参届</h1>
     <label>教会名（団体名）<span class="req">*</span></label><input type="text" id="church">
     <label>帰参者名（代表）<span class="req">*</span></label><input type="text" id="repName" placeholder="帰参される方の名前">
-    <label>連絡先<span class="req">*</span></label><input type="tel" id="tel">
+    <label>連絡先<span class="req">*</span></label><input type="tel" id="tel" placeholder="帰参される方の連絡先">
     
     <label>人数</label>
     <div class="flex-row">
@@ -83,7 +76,7 @@
         <option value="独自">独自</option>
     </select>
     <div id="transSubArea" class="hidden"><select id="transportSub" onchange="toggleCarNum()" style="margin-top:10px;"></select></div>
-    <div id="carNumArea" class="hidden"><label>自家用車 台数</label><input type="number" id="carNum"></div>
+    <div id="carNumArea" class="hidden"><label id="carNumLabel">台数</label><input type="number" id="carNum"></div>
 
     <h2>食事・宿泊</h2>
     <div id="dateList">日付を入力すると表示されます</div>
@@ -119,6 +112,12 @@
 
 <div id="imageResultPage" class="container">
     <h1>送信用画像</h1>
+    <div class="guide-box">
+        <strong>【送信方法】</strong><br>
+        ◯iPhoneの方：帰参届画像をワンタップ、長押しして共有からメール・LINEで送信。<br>
+        ◯androidの方：帰参届部分をスクリーンショット（電源＋音量小を同時押し）して共有からメール・LINEで送信<br>
+        ◯秩父詰所：chichibu133@gmail.com
+    </div>
     <div id="imageDisplay" style="text-align: center;"></div>
     <button class="btn" onclick="backToConfirm()" style="background:#ccc; margin-top:20px;">戻る</button>
 </div>
@@ -162,8 +161,14 @@
     function toggleCarNum() {
         const sub = document.getElementById('transportSub').value;
         const carArea = document.getElementById('carNumArea');
-        if (sub === "自家用車") carArea.classList.remove('hidden');
-        else carArea.classList.add('hidden');
+        const label = document.getElementById('carNumLabel');
+        // 観光バス・マイクロバス・自家用車の場合に台数入力を表示
+        if (["観光バス", "マイクロバス", "自家用車"].includes(sub)) {
+            carArea.classList.remove('hidden');
+            label.innerText = sub + " 台数";
+        } else {
+            carArea.classList.add('hidden');
+        }
     }
 
     function generateMealTable() {
@@ -194,9 +199,11 @@
         const a = Number(document.getElementById('pAdult').value || 0);
         const c = Number(document.getElementById('pChild').value || 0);
         const b = Number(document.getElementById('pBaby').value || 0);
-        const carStr = document.getElementById('transportSub').value === "自家用車" ? `(${document.getElementById('carNum').value}台)` : "";
+        
+        const sub = document.getElementById('transportSub').value;
+        const count = document.getElementById('carNum').value;
+        const carStr = (["観光バス", "マイクロバス", "自家用車"].includes(sub) && count) ? ` (${count}台)` : "";
 
-        // 確認画面：「代表者」から「帰参者」に変更
         document.getElementById('summaryTable').innerHTML = `
             <table>
                 <tr><th width="35%">教会名</th><td>${document.getElementById('church').value}</td></tr>
@@ -205,14 +212,13 @@
                 <tr><th>人数</th><td>${a+c+b}名 (大${a}/子${c}/乳${b})</td></tr>
                 <tr><th>到着予定</th><td>${formatNoYear(document.getElementById('arrDate').value)} ${document.getElementById('arrTime').value}</td></tr>
                 <tr><th>出発予定</th><td>${formatNoYear(document.getElementById('depDate').value)} ${document.getElementById('depTime').value}</td></tr>
-                <tr><th>交通手段</th><td>${document.getElementById('transportMain').value}-${document.getElementById('transportSub').value}${carStr}</td></tr>
+                <tr><th>交通手段</th><td>${document.getElementById('transportMain').value}-${sub}${carStr}</td></tr>
             </table>
         `;
 
         let mRows = "";
         document.querySelectorAll('#dateList tr').forEach((tr, i) => {
             if(i === 0) return;
-            // 0を表示しない（空白にする）処理
             const v = Array.from(tr.querySelectorAll('input')).map(inp => {
                 const val = inp.value || "0";
                 return val === "0" ? "" : val;
