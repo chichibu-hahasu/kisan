@@ -74,9 +74,22 @@
         <option value="">選択してください</option>
         <option value="公共交通">公共交通</option>
         <option value="独自">独自</option>
+        <option value="同乗">同乗</option>
     </select>
-    <div id="transSubArea" class="hidden"><select id="transportSub" onchange="toggleCarNum()" style="margin-top:10px;"></select></div>
-    <div id="carNumArea" class="hidden"><label id="carNumLabel">台数</label><input type="number" id="carNum"></div>
+    
+    <div id="transSubArea" class="hidden">
+        <select id="transportSub" onchange="toggleCarNum()" style="margin-top:10px;"></select>
+    </div>
+
+    <div id="freeInputArea" class="hidden">
+        <label id="freeInputLabel">詳細入力</label>
+        <input type="text" id="transportFree" placeholder="入力してください">
+    </div>
+
+    <div id="carNumArea" class="hidden">
+        <label id="carNumLabel">台数</label>
+        <input type="number" id="carNum">
+    </div>
 
     <h2>食事・宿泊</h2>
     <div id="dateList">日付を入力すると表示されます</div>
@@ -147,27 +160,45 @@
         const main = document.getElementById('transportMain').value;
         const sub = document.getElementById('transportSub');
         const subArea = document.getElementById('transSubArea');
+        const freeArea = document.getElementById('freeInputArea');
+        const carArea = document.getElementById('carNumArea');
+
         sub.innerHTML = '<option value="">詳細を選択</option>';
+        freeArea.classList.add('hidden');
+        carArea.classList.add('hidden');
+
         if (main === "公共交通") {
             subArea.classList.remove('hidden');
             ['電車', 'バス'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`);
         } else if (main === "独自") {
             subArea.classList.remove('hidden');
             ['観光バス', 'マイクロバス', '自家用車', '他'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`);
-        } else { subArea.classList.add('hidden'); }
-        toggleCarNum();
+        } else if (main === "同乗") {
+            subArea.classList.remove('hidden');
+            ['大教会号', '他(同乗先入力)'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`);
+        } else {
+            subArea.classList.add('hidden');
+        }
     }
 
     function toggleCarNum() {
+        const main = document.getElementById('transportMain').value;
         const sub = document.getElementById('transportSub').value;
         const carArea = document.getElementById('carNumArea');
-        const label = document.getElementById('carNumLabel');
-        // 観光バス・マイクロバス・自家用車の場合に台数入力を表示
-        if (["観光バス", "マイクロバス", "自家用車"].includes(sub)) {
+        const freeArea = document.getElementById('freeInputArea');
+        const freeLabel = document.getElementById('freeInputLabel');
+        const freeInput = document.getElementById('transportFree');
+
+        carArea.classList.add('hidden');
+        freeArea.classList.add('hidden');
+
+        if (main === "同乗" && sub === "他(同乗先入力)") {
+            freeArea.classList.remove('hidden');
+            freeLabel.innerText = "同乗先";
+            freeInput.placeholder = "例：〇〇教会号";
+        } else if (["観光バス", "マイクロバス", "自家用車"].includes(sub)) {
             carArea.classList.remove('hidden');
-            label.innerText = sub + " 台数";
-        } else {
-            carArea.classList.add('hidden');
+            document.getElementById('carNumLabel').innerText = sub + " 台数";
         }
     }
 
@@ -200,9 +231,14 @@
         const c = Number(document.getElementById('pChild').value || 0);
         const b = Number(document.getElementById('pBaby').value || 0);
         
+        const main = document.getElementById('transportMain').value;
         const sub = document.getElementById('transportSub').value;
+        const free = document.getElementById('transportFree').value;
         const count = document.getElementById('carNum').value;
-        const carStr = (["観光バス", "マイクロバス", "自家用車"].includes(sub) && count) ? ` (${count}台)` : "";
+        
+        let transDisplay = main + "-" + sub;
+        if (sub === "他(同乗先入力)") transDisplay = "同乗 (" + free + ")";
+        if (["観光バス", "マイクロバス", "自家用車"].includes(sub) && count) transDisplay += " (" + count + "台)";
 
         document.getElementById('summaryTable').innerHTML = `
             <table>
@@ -212,7 +248,7 @@
                 <tr><th>人数</th><td>${a+c+b}名 (大${a}/子${c}/乳${b})</td></tr>
                 <tr><th>到着予定</th><td>${formatNoYear(document.getElementById('arrDate').value)} ${document.getElementById('arrTime').value}</td></tr>
                 <tr><th>出発予定</th><td>${formatNoYear(document.getElementById('depDate').value)} ${document.getElementById('depTime').value}</td></tr>
-                <tr><th>交通手段</th><td>${document.getElementById('transportMain').value}-${sub}${carStr}</td></tr>
+                <tr><th>交通手段</th><td>${transDisplay}</td></tr>
             </table>
         `;
 
@@ -230,7 +266,7 @@
         const tDate = document.getElementById('ticketDate').value;
         const tCount = document.getElementById('ticketCount').value;
         document.getElementById('ticketArea').innerHTML = (tDate && tCount && tCount != "0") 
-            ? `<div style="color:red; font-weight:bold; border:2px solid red; padding:5px; margin-top:10px; font-size:0.8rem; text-align:center;">直属食券: ${formatNoYear(tDate)} ${tCount}枚</div>` : "";
+            ? `<div style="color:red; font-weight:bold; border:1px solid red; padding:5px; margin-top:10px; font-size:0.8rem; text-align:center;">直属食券: ${formatNoYear(tDate)} ${tCount}枚</div>` : "";
 
         document.getElementById('memoArea').innerHTML = `<strong>備考:</strong> ${document.getElementById('memo').value}`;
 
