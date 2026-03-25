@@ -2,16 +2,17 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>帰参届システム</title>
     <link rel="apple-touch-icon" href="icon.png">
     <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --main-red: #e74c3c; --line-green: #06C755; }
+        :root { --main-red: #e74c3c; --line-green: #06C755; --dark-bg: #34495e; }
         body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding-bottom: 20px; }
         h1 { text-align: center; font-size: 1.6rem; margin-bottom: 10px; color: #333; }
+        h2 { font-size: 1.3rem; margin-top: 20px; border-bottom: 2px solid var(--dark-bg); padding-bottom: 5px; }
         label { display: block; margin-top: 8px; font-weight: bold; font-size: 0.85rem; }
         .req { color: red; margin-left: 3px; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
@@ -19,25 +20,72 @@
         .flex-row div { flex: 1; }
         .red-box { border: 2px solid var(--main-red); padding: 10px; border-radius: 8px; margin-top: 15px; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-confirm { background: #34495e; color: white; }
-        .btn-next { background: #e67e22; color: white; }
+        .btn-confirm { background: var(--dark-bg); color: white; }
+        .btn-next { background: #e67e22; color: white; margin-top: 0; }
         
+        /* 認証ページ */
         #authPage { text-align: center; padding: 20px 15px; }
         .checkbox-container { display: flex; align-items: flex-start; justify-content: center; gap: 15px; margin: 25px 0; background: #fff5f5; padding: 20px; border-radius: 10px; border: 1px solid #ffcccc; text-align: left; }
         #authCheck { width: 25px; height: 25px; margin-top: 5px; cursor: pointer; }
         .auth-label { font-size: 1.05rem; font-weight: bold; color: #c0392b; cursor: pointer; line-height: 1.6; }
 
-        #captureArea { background: white; padding: 20px; width: 360px; height: 640px; margin: 0 auto; box-sizing: border-box; display: flex; flex-direction: column; position: relative; overflow: hidden; }
-        table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
-        th, td { border: 1px solid #ccc; padding: 3px; text-align: center; font-size: 0.75rem; }
-        th { background: #eee; }
+        /* 入力ページ特有 */
         input[type="number"] { padding: 4px 2px; font-size: 1.1rem; text-align: center; }
-        
+        #totalDisplay { margin-top:5px; font-size:0.85rem; color:#666; }
+        #dateList table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        #dateList th, #dateList td { border: 1px solid #ccc; padding: 3px; text-align: center; font-size: 0.75rem; }
+        #dateList th { background: #eee; }
+        .caution-text { font-size: 0.7rem; color: #d35400; font-weight: bold; margin-top: 4px; }
+
+        /* ページ制御 */
         #inputPage, #confirmPage, #imageResultPage { display: none; }
         .hidden { display: none; }
+
+        /* ★確認画面：ボタンを下に固定するレイアウト */
+        #confirmPage { padding-bottom: 80px; /* 下部ボタンエリアのスペースを確保 */ }
+        #confirmScrollArea { position: relative; width: 360px; margin: 0 auto; overflow: visible; }
+        
+        /* 画像化エリア（ここだけをhtml2canvasでキャプチャする） */
+        #captureArea { 
+            background: white; 
+            padding: 15px; 
+            width: 360px; 
+            /* height固定を解除し、中身に応じた高さにする */
+            margin: 0 auto; 
+            box-sizing: border-box; 
+            display: flex; 
+            flex-direction: column; 
+            position: relative; 
+            border: 1px solid #eee; /* スマホ画面上で境目をわかりやすく */
+        }
+        
+        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
+        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 4px 2px; text-align: center; font-size: 0.8rem; line-height: 1.2; }
+        #captureArea th { background: #eee; }
+        
+        /* 宿泊明細部分のコンテナ：余白調整用 */
+        #mealDetailWrapper { margin-top: 5px; }
+
+        /* ★確認画面の下部固定ボタンエリア */
+        .fixed-bottom-btns {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 10px;
+            box-sizing: border-box;
+            border-top: 1px solid #ddd;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            z-index: 100;
+        }
+        .fixed-bottom-btns .btn { flex: 1; max-width: 200px; margin: 0; font-size: 1rem; padding: 12px; }
+
+        /* 結果ページ */
         .result-img { width: 100%; max-width: 360px; border: 2px solid #333; margin-top: 10px; }
-        .guide-box { font-size: 0.85rem; background: #f0f4f8; padding: 12px; border-radius: 8px; border: 1px solid #34495e; margin-bottom: 10px; line-height: 1.6; }
-        .caution-text { font-size: 0.7rem; color: #d35400; font-weight: bold; margin-top: 4px; }
+        .guide-box { font-size: 0.85rem; background: #f0f4f8; padding: 12px; border-radius: 8px; border: 1px solid var(--dark-bg); margin-bottom: 10px; line-height: 1.6; text-align: left;}
     </style>
 </head>
 <body>
@@ -57,7 +105,7 @@
 </div>
 
 <div id="inputPage" class="container">
-    <h1>帰参届</h1>
+    <h1>帰参届 入力</h1>
     <label>教会名（団体名）<span class="req">*</span></label><input type="text" id="church">
     <label>帰参者名（代表）<span class="req">*</span></label><input type="text" id="repName" placeholder="帰参される方の名前">
     <label>連絡先<span class="req">*</span></label><input type="tel" id="tel" placeholder="帰参される方の連絡先">
@@ -68,7 +116,7 @@
         <div><small>子供</small><input type="number" id="pChild" oninput="calcTotal()" placeholder="0"></div>
         <div><small>乳児</small><input type="number" id="pBaby" oninput="calcTotal()" placeholder="0"></div>
     </div>
-    <div id="totalDisplay" style="margin-top:5px; font-size:0.85rem; color:#666;">合計：0名</div>
+    <div id="totalDisplay">合計：0名</div>
 
     <label>詰所到着予定日時<span class="req">*</span></label>
     <div class="flex-row"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="time" id="arrTime"></div>
@@ -110,64 +158,83 @@
     </div>
     
     <label>備考</label>
-    <textarea id="memo" rows="2" placeholder="女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
+    <textarea id="memo" rows="3" placeholder="女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
 
     <button class="btn btn-confirm" onclick="showConfirm()">確認ページへ</button>
 </div>
 
-<div id="confirmPage" class="container">
-    <div id="captureArea">
-        <h2 style="text-align: center; margin: 0 0 10px 0; border-bottom: 2px solid #333; padding-bottom: 5px;">帰参届</h2>
-        <div id="summaryTable"></div>
-        <h3 style="font-size: 0.9rem; margin: 10px 0 5px 0; border-left: 4px solid #34495e; padding-left: 5px;">食事・宿泊明細</h3>
-        <div id="mealDetailTable" style="flex-grow: 1; overflow: hidden;"></div>
-        <div id="ticketArea"></div>
-        <div id="memoArea" style="margin-top:10px; font-size:0.75rem; border-top:1px dashed #ccc; padding-top:5px;"></div>
-        <div style="text-align: right; font-size: 0.6rem; color: #999; margin-top: auto;">Generated by 帰参届システム</div>
+<div id="confirmPage">
+    <h1 style="text-align:center; background:white; margin:0; padding:10px 0;">内容確認</h1>
+    
+    <div id="confirmScrollArea">
+        <div id="captureArea">
+            <h2 style="text-align: center; margin: 0 0 10px 0; border-bottom: 2px solid #333; padding-bottom: 5px; font-size:1.4rem;">帰参届</h2>
+            <div id="summaryTable"></div>
+            
+            <h3 style="font-size: 0.95rem; margin: 10px 0 0 0; border-left: 4px solid var(--dark-bg); padding-left: 5px;">食事・宿泊明細</h3>
+            <div id="mealDetailWrapper">
+                <div id="mealDetailTable"></div>
+            </div>
+            
+            <div id="ticketArea"></div>
+            
+            <div id="memoArea" style="margin-top:10px; font-size:1rem; border-top:1px dashed #ccc; padding-top:8px; line-height:1.4;"></div>
+            
+            <div style="text-align: right; font-size: 0.6rem; color: #999; margin-top: 15px;">Generated by 帰参届システム</div>
+        </div>
     </div>
-    <button class="btn btn-next" onclick="makeScreenshot()">次へ</button>
-    <button class="btn" onclick="goBack()" style="background:#ccc;">修正する</button>
+
+    <div class="fixed-bottom-btns">
+        <button class="btn" onclick="goBack()" style="background:#ccc; color:#333;">修正する</button>
+        <button class="btn btn-next" onclick="makeScreenshot()">次へ (画像作成)</button>
+    </div>
 </div>
 
 <div id="imageResultPage" class="container">
-    <h1>送信用画像</h1>
+    <h1>送信用画像 完成</h1>
     <div class="guide-box">
         <strong>【送信方法】</strong><br>
-        ◯iPhoneの方：帰参届画像をワンタップ、長押しして共有からメール・LINEで送信。<br>
-        ◯androidの方：帰参届部分をスクリーンショット（電源＋音量小を同時押し）して共有からメール・LINEで送信<br>
-        ◯秩父詰所：chichibu133@gmail.com
+        ◯iPhoneの方：下の画像をワンタップ、または長押しして「共有」からメール・LINEで送信。<br>
+        ◯Androidの方：画像部分をスクリーンショット（電源＋音量小を同時押し）して「共有」からメール・LINEで送信<br>
+        <span style="color:red; font-weight:bold;">◯秩父詰所宛先：chichibu133@gmail.com</span>
     </div>
     <div id="imageDisplay" style="text-align: center;"></div>
     <button class="btn" onclick="backToConfirm()" style="background:#ccc; margin-top:20px;">戻る</button>
 </div>
 
 <script>
+    // 汎用ユーティリティ
+    const getById = (id) => document.getElementById(id);
+    const getAll = (sel) => document.querySelectorAll(sel);
+
+    // 1. 認証ページロジック
     function toggleStartBtn() {
-        const checked = document.getElementById('authCheck').checked;
-        const btn = document.getElementById('startBtn');
+        const checked = getById('authCheck').checked;
+        const btn = getById('startBtn');
         btn.disabled = !checked;
         btn.style.opacity = checked ? "1" : "0.3";
     }
 
     function goToInput() {
-        document.getElementById('authPage').style.display = 'none';
-        document.getElementById('inputPage').style.display = 'block';
+        getById('authPage').style.display = 'none';
+        getById('inputPage').style.display = 'block';
         window.scrollTo(0,0);
     }
 
+    // 2. 入力ページロジック
     function calcTotal() {
-        const a = Number(document.getElementById('pAdult').value || 0);
-        const c = Number(document.getElementById('pChild').value || 0);
-        const b = Number(document.getElementById('pBaby').value || 0);
-        document.getElementById('totalDisplay').innerText = `合計：${a + c + b}名`;
+        const a = Number(getById('pAdult').value || 0);
+        const c = Number(getById('pChild').value || 0);
+        const b = Number(getById('pBaby').value || 0);
+        getById('totalDisplay').innerText = `合計：${a + c + b}名`;
     }
 
     function toggleTransport() {
-        const main = document.getElementById('transportMain').value;
-        const sub = document.getElementById('transportSub');
-        const subArea = document.getElementById('transSubArea');
-        const freeArea = document.getElementById('freeInputArea');
-        const carArea = document.getElementById('carNumArea');
+        const main = getById('transportMain').value;
+        const sub = getById('transportSub');
+        const subArea = getById('transSubArea');
+        const freeArea = getById('freeInputArea');
+        const carArea = getById('carNumArea');
 
         sub.innerHTML = '<option value="">詳細を選択</option>';
         freeArea.classList.add('hidden');
@@ -188,11 +255,11 @@
     }
 
     function toggleCarNum() {
-        const main = document.getElementById('transportMain').value;
-        const sub = document.getElementById('transportSub').value;
-        const carArea = document.getElementById('carNumArea');
-        const freeArea = document.getElementById('freeInputArea');
-        const freeLabel = document.getElementById('freeInputLabel');
+        const main = getById('transportMain').value;
+        const sub = getById('transportSub').value;
+        const carArea = getById('carNumArea');
+        const freeArea = getById('freeInputArea');
+        const freeLabel = getById('freeInputLabel');
 
         carArea.classList.add('hidden');
         freeArea.classList.add('hidden');
@@ -202,23 +269,25 @@
             freeLabel.innerText = "同乗先";
         } else if (["観光バス", "マイクロバス", "自家用車"].includes(sub)) {
             carArea.classList.remove('hidden');
-            document.getElementById('carNumLabel').innerText = sub + " 台数";
+            getById('carNumLabel').innerText = sub + " 台数";
         }
     }
 
     function generateMealTable() {
-        const s = document.getElementById('arrDate').value;
-        const e = document.getElementById('depDate').value;
+        const s = getById('arrDate').value;
+        const e = getById('depDate').value;
         if (!s || !e) return;
         const start = new Date(s); const end = new Date(e);
-        let html = '<table><tr><th width="25%">日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th></tr>';
+        if (start > end) return;
+
+        let html = '<table><tr><th width="28%">日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th></tr>';
         let curr = new Date(start);
         while (curr <= end) {
             const d = (curr.getMonth()+1) + '/' + curr.getDate();
             html += `<tr><td>${d}</td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td></tr>`;
             curr.setDate(curr.getDate() + 1);
         }
-        document.getElementById('dateList').innerHTML = html + '</table>';
+        getById('dateList').innerHTML = html + '</table>';
     }
 
     function formatNoYear(dateStr) {
@@ -227,75 +296,110 @@
         return (d.getMonth() + 1) + "月" + d.getDate() + "日";
     }
 
+    // 3. 確認ページロジック（表示処理）
     function showConfirm() {
+        // 必須チェック
         const req = ['church', 'repName', 'tel', 'arrDate', 'depDate'];
-        if (req.some(id => !document.getElementById(id).value)) { alert('必須項目を入力してください'); return; }
+        if (req.some(id => !getById(id).value)) { alert('必須項目（*）を入力してください'); return; }
         
-        const a = Number(document.getElementById('pAdult').value || 0);
-        const c = Number(document.getElementById('pChild').value || 0);
-        const b = Number(document.getElementById('pBaby').value || 0);
+        // 人数
+        const a = Number(getById('pAdult').value || 0);
+        const c = Number(getById('pChild').value || 0);
+        const b = Number(getById('pBaby').value || 0);
         
-        const main = document.getElementById('transportMain').value;
-        const sub = document.getElementById('transportSub').value;
-        const free = document.getElementById('transportFree').value || "";
-        const count = document.getElementById('carNum').value;
+        // 交通手段の表示ロジック
+        const main = getById('transportMain').value;
+        const sub = getById('transportSub').value;
+        const free = getById('transportFree').value || "";
+        const count = getById('carNum').value;
         
-        let transDisplay = main + "-" + sub;
-        if (sub === "他(同乗先入力)") transDisplay = "同乗 (" + free + ")";
+        let transDisplay = main + (sub ? "-" + sub : "");
+        if (main === "同乗" && sub === "他(同乗先入力)") transDisplay = "同乗 (" + free + ")";
         if (["観光バス", "マイクロバス", "自家用車"].includes(sub) && count) transDisplay += " (" + count + "台)";
 
-        document.getElementById('summaryTable').innerHTML = `
+        // 基本情報テーブル生成
+        getById('summaryTable').innerHTML = `
             <table>
-                <tr><th width="35%">教会名</th><td>${document.getElementById('church').value}</td></tr>
-                <tr><th>帰参者</th><td>${document.getElementById('repName').value}</td></tr>
-                <tr><th>連絡先</th><td>${document.getElementById('tel').value}</td></tr>
-                <tr><th>人数</th><td>${a+c+b}名 (大${a}/子${c}/乳${b})</td></tr>
-                <tr><th>到着予定</th><td>${formatNoYear(document.getElementById('arrDate').value)} ${document.getElementById('arrTime').value}</td></tr>
-                <tr><th>出発予定</th><td>${formatNoYear(document.getElementById('depDate').value)} ${document.getElementById('depTime').value}</td></tr>
+                <tr><th width="35%">教会名</th><td>${getById('church').value}</td></tr>
+                <tr><th>帰参者(代表)</th><td>${getById('repName').value}</td></tr>
+                <tr><th>連絡先</th><td>${getById('tel').value}</td></tr>
+                <tr><th>人数</th><td style="font-size:0.9rem;">${a+c+b}名<br>(大${a}/子${c}/乳${b})</td></tr>
+                <tr><th>到着予定</th><td>${formatNoYear(getById('arrDate').value)}<br>${getById('arrTime').value}</td></tr>
+                <tr><th>出発予定</th><td>${formatNoYear(getById('depDate').value)}<br>${getById('depTime').value}</td></tr>
                 <tr><th>交通手段</th><td>${transDisplay}</td></tr>
             </table>
         `;
 
+        // 食事宿泊明細テーブル生成
         let mRows = "";
-        document.querySelectorAll('#dateList tr').forEach((tr, i) => {
-            if(i === 0) return;
-            const v = Array.from(tr.querySelectorAll('input')).map(inp => {
+        let hasData = false;
+        getAll('#dateList tr').forEach((tr, i) => {
+            if(i === 0) return; // ヘッダー飛ばす
+            const dateCell = tr.cells[0].innerText;
+            const inputs = tr.querySelectorAll('input');
+            const v = Array.from(inputs).map(inp => {
                 const val = inp.value || "0";
-                return val === "0" ? "" : val;
+                if(val !== "0") hasData = true;
+                return val === "0" ? "" : val; // 0は空欄にする
             });
-            mRows += `<tr><td>${tr.cells[0].innerText}</td><td>${v[0]}</td><td>${v[1]}</td><td>${v[2]}</td><td>${v[3]}</td></tr>`;
+            mRows += `<tr><td>${dateCell}</td><td>${v[0]}</td><td>${v[1]}</td><td>${v[2]}</td><td>${v[3]}</td></tr>`;
         });
-        document.getElementById('mealDetailTable').innerHTML = `<table><tr><th width="25%">日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th></tr>${mRows}</table>`;
+        
+        getById('mealDetailTable').innerHTML = `
+            <table style="margin-bottom:0;"> <tr><th width="28%">日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th></tr>
+                ${mRows}
+            </table>`;
 
-        const tDate = document.getElementById('ticketDate').value;
-        const tCount = document.getElementById('ticketCount').value;
-        document.getElementById('ticketArea').innerHTML = (tDate && tCount && tCount != "0") 
-            ? `<div style="color:red; font-weight:bold; border:1px solid red; padding:5px; margin-top:10px; font-size:0.8rem; text-align:center;">直属食券: ${formatNoYear(tDate)} ${tCount}枚</div>` : "";
+        // 直属食券
+        const tDate = getById('ticketDate').value;
+        const tCount = getById('ticketCount').value;
+        getById('ticketArea').innerHTML = (tDate && tCount && tCount != "0") 
+            ? `<div style="color:red; font-weight:bold; border:1px solid red; padding:5px; margin-top:10px; font-size:0.85rem; text-align:center;">直属食券: ${formatNoYear(tDate)} ${tCount}枚</div>` : "";
 
-        document.getElementById('memoArea').innerHTML = `<strong>備考:</strong> ${document.getElementById('memo').value}`;
+        // 備考（★文字を大きく）
+        const memoVal = getById('memo').value;
+        getById('memoArea').innerHTML = memoVal ? `<strong>備考:</strong><br>${memoVal.replace(/\n/g, '<br>')}` : "<strong>備考:</strong> なし";
+        getById('memoArea').style.display = memoVal ? 'block' : 'none'; // 備考がなければエリア自体非表示
 
-        document.getElementById('inputPage').style.display = 'none';
-        document.getElementById('confirmPage').style.display = 'block';
+        // ページ切り替え
+        getById('inputPage').style.display = 'none';
+        getById('confirmPage').style.display = 'block';
         window.scrollTo(0,0);
     }
 
+    // 4. 画像作成・結果ページロジック
     async function makeScreenshot() {
-        const area = document.getElementById('captureArea');
-        const canvas = await html2canvas(area, { scale: 3, width: 360, height: 640 });
+        alert('これから送信用画像を作成します。十数秒かかる場合がありますので、そのままお待ちください。');
+        
+        const area = getById('captureArea');
+        
+        // html2canvas実行（scaleを上げて高画質に、高さは自動指定）
+        const canvas = await html2canvas(area, { 
+            scale: 3, 
+            width: 360,
+            // heightを指定しないことで、中身（captureAreaの自動高さ）に合わせる
+            backgroundColor: "#ffffff", // 背景を白に確定
+            logging: false
+        });
+        
         const imgData = canvas.toDataURL("image/png");
-        document.getElementById('imageDisplay').innerHTML = `<img src="${imgData}" class="result-img">`;
-        document.getElementById('confirmPage').style.display = 'none';
-        document.getElementById('imageResultPage').style.display = 'block';
+        getById('imageDisplay').innerHTML = `<img src="${imgData}" class="result-img">`;
+        
+        // ページ切り替え
+        getById('confirmPage').style.display = 'none';
+        getById('imageResultPage').style.display = 'block';
         window.scrollTo(0,0);
     }
 
     function backToConfirm() {
-        document.getElementById('imageResultPage').style.display = 'none';
-        document.getElementById('confirmPage').style.display = 'block';
+        getById('imageResultPage').style.display = 'none';
+        getById('confirmPage').style.display = 'block';
+        window.scrollTo(0,0);
     }
     function goBack() {
-        document.getElementById('confirmPage').style.display = 'none';
-        document.getElementById('inputPage').style.display = 'block';
+        getById('confirmPage').style.display = 'none';
+        getById('inputPage').style.display = 'block';
+        window.scrollTo(0,0);
     }
 </script>
 </body>
