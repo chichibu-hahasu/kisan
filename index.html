@@ -6,87 +6,58 @@
     <title>帰参届</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 15px; }
+        body { font-family: sans-serif; padding: 20px; line-height: 1.6; }
         .container { max-width: 400px; margin: auto; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; font-size: 1rem; }
-        .btn { width: 100%; padding: 15px; background: #34495e; color: white; border: none; font-size: 1.1rem; margin-top: 10px; }
-        #captureArea { background: white; padding: 20px; border: 1px solid #ccc; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #34495e; color: white; border: none; font-weight: bold; margin-top: 10px; }
+        #resultArea { margin-top: 20px; padding: 10px; border: 1px solid #ccc; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #999; padding: 8px; text-align: center; font-size: 0.9rem; }
-        th { background: #eee; }
+        th, td { border: 1px solid #ccc; padding: 5px; text-align: center; }
+        th { background: #f0f0f0; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div id="inputPage" class="container">
-    <h2>帰参届入力</h2>
+    <h2>帰参届</h2>
     <label>教会名</label><input type="text" id="church">
     <label>帰参者名</label><input type="text" id="repName">
-    <label>人数（大人/子供）</label>
-    <div style="display:flex; gap:5px;">
-        <input type="number" id="pAdult" placeholder="大人">
-        <input type="number" id="pChild" placeholder="子供">
-    </div>
-    <label>交通手段</label>
-    <select id="transport" onchange="updateTransport()">
-        <option value="鉄道">鉄道</option>
-        <option value="バス">バス</option>
-        <option value="自教会">自教会</option>
-    </select>
-    <select id="transportDetail" class="hidden"></select>
-    
-    <label>日付入力</label>
-    <input type="date" id="arrDate" onchange="generateTable()">
-    <input type="date" id="depDate" onchange="generateTable()">
-    
-    <div id="dateList"></div>
-    <button class="btn" onclick="showConfirm()">確認画面へ</button>
+    <label>人数</label><input type="number" id="pNum">
+    <label>日付（開始）</label><input type="date" id="startDate" onchange="createTable()">
+    <label>日付（終了）</label><input type="date" id="endDate" onchange="createTable()">
+    <div id="tableContainer"></div>
+    <button class="btn" onclick="confirmData()">確認</button>
 </div>
 
 <div id="confirmPage" class="container hidden">
-    <div id="captureArea">
-        <div id="result"></div>
-    </div>
+    <div id="resultArea"></div>
     <button class="btn" onclick="location.reload()">修正する</button>
-    <button class="btn" onclick="makeImage()">画像作成</button>
+    <button class="btn" onclick="capture()">画像作成</button>
 </div>
 
 <script>
-    function updateTransport() {
-        const t = document.getElementById('transport').value;
-        const d = document.getElementById('transportDetail');
-        d.classList.add('hidden');
-        if(t === 'バス') {
-            d.classList.remove('hidden');
-            d.innerHTML = '<option>昼行</option><option>夜行</option>';
-        } else if(t === '自教会') {
-            d.classList.remove('hidden');
-            d.innerHTML = '<option>観光バス</option><option>自家用車</option>';
+    function createTable() {
+        const start = new Date(document.getElementById('startDate').value);
+        const end = new Date(document.getElementById('endDate').value);
+        if (isNaN(start) || isNaN(end)) return;
+        let html = '<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th></tr>';
+        for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td>
+                <td><input type="number" class="m"></td><td><input type="number" class="m"></td>
+                <td><input type="number" class="m"></td><td><input type="number" class="m"></td></tr>`;
         }
+        document.getElementById('tableContainer').innerHTML = html + '</table>';
     }
-
-    function generateTable() {
-        const s = new Date(document.getElementById('arrDate').value);
-        const e = new Date(document.getElementById('depDate').value);
-        const child = Number(document.getElementById('pChild').value) > 0;
-        let html = '<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>' + (child ? '<th>泊(子)</th>' : '') + '</tr>';
-        for(let d = new Date(s); d <= e; d.setDate(d.getDate() + 1)) {
-            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" class="val" value="0"></td><td><input type="number" class="val" value="0"></td><td><input type="number" class="val" value="0"></td><td><input type="number" class="val" value="0"></td>` + (child ? '<td><input type="number" class="val" value="0"></td>' : '') + '</tr>';
-        }
-        document.getElementById('dateList').innerHTML = html + '</table>';
-    }
-
-    function showConfirm() {
-        let res = `<h3>帰参届</h3><p>教会: ${document.getElementById('church').value}<br>代表: ${document.getElementById('repName').value}<br>交通: ${document.getElementById('transport').value}</p>`;
-        res += document.getElementById('dateList').innerHTML;
-        document.getElementById('result').innerHTML = res;
+    function confirmData() {
+        let res = `教会: ${document.getElementById('church').value}<br>代表: ${document.getElementById('repName').value}<br>`;
+        res += document.getElementById('tableContainer').innerHTML;
+        document.getElementById('resultArea').innerHTML = res;
         document.getElementById('inputPage').classList.add('hidden');
         document.getElementById('confirmPage').classList.remove('hidden');
     }
-
-    async function makeImage() {
-        const canvas = await html2canvas(document.getElementById('captureArea'));
+    async function capture() {
+        const canvas = await html2canvas(document.getElementById('resultArea'));
         document.body.innerHTML = '<img src="'+canvas.toDataURL()+'" style="width:100%">';
     }
 </script>
