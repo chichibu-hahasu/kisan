@@ -4,385 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>帰参届システム</title>
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        :root { --main-red: #e74c3c; --line-green: #06C755; --dark-bg: #34495e; }
+        :root { --main-red: #e74c3c; --dark-bg: #34495e; }
         body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding-bottom: 20px; }
-        h1 { text-align: center; font-size: 1.6rem; margin-bottom: 10px; color: #333; }
-        h2 { font-size: 1.3rem; margin-top: 20px; border-bottom: 2px solid var(--dark-bg); padding-bottom: 5px; }
-        label { display: block; margin-top: 8px; font-weight: bold; font-size: 0.85rem; }
-        .req { color: red; margin-left: 3px; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .flex-row { display: flex; gap: 8px; align-items: center; }
-        .flex-row div { flex: 1; }
-        .red-box { border: 2px solid var(--main-red); padding: 10px; border-radius: 8px; margin-top: 15px; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; }
         .btn-confirm { background: var(--dark-bg); color: white; }
-        .btn-next { background: #e67e22; color: white; margin-top: 0; }
         
-        /* 1. 最初の確認ページ（復活） */
-        #authPage { text-align: center; padding: 20px 15px; }
-        .checkbox-container { display: flex; align-items: flex-start; justify-content: center; gap: 15px; margin: 25px 0; background: #fff5f5; padding: 20px; border-radius: 10px; border: 1px solid #ffcccc; text-align: left; }
-        #authCheck { width: 25px; height: 25px; margin-top: 5px; cursor: pointer; }
-        .auth-label { font-size: 1.05rem; font-weight: bold; color: #c0392b; cursor: pointer; line-height: 1.6; }
-
-        /* 入力ページ特有 */
-        input[type="number"] { padding: 4px 2px; font-size: 1.1rem; text-align: center; }
-        #totalDisplay { margin-top:5px; font-size:0.85rem; color:#666; }
-        #dateList table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        #dateList th, #dateList td { border: 1px solid #ccc; padding: 3px; text-align: center; font-size: 0.75rem; }
-        #dateList th { background: #eee; }
-        .caution-text { font-size: 0.7rem; color: #d35400; font-weight: bold; margin-top: 4px; }
-
-        /* ページ制御 */
-        #inputPage, #confirmPage, #imageResultPage { display: none; }
-        .hidden { display: none; }
-
-        /* 確認画面：ボタンを下に固定するレイアウト */
+        #authPage { text-align: center; }
+        .checkbox-container { display: flex; align-items: flex-start; justify-content: center; gap: 10px; margin: 20px 0; background: #fff5f5; padding: 15px; border-radius: 8px; }
+        
         #confirmPage { padding-bottom: 80px; }
-        #confirmScrollArea { position: relative; width: 360px; margin: 0 auto; overflow: visible; }
-        
-        /* 画像化エリア */
-        #captureArea { 
-            background: white; 
-            padding: 15px; 
-            width: 360px; 
-            margin: 0 auto; 
-            box-sizing: border-box; 
-            display: flex; 
-            flex-direction: column; 
-            position: relative; 
-            border: 1px solid #eee;
-        }
-        
-        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
-        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 4px 2px; text-align: center; font-size: 0.75rem; line-height: 1.2; }
+        #captureArea { background: white; padding: 15px; width: 360px; margin: 0 auto; box-sizing: border-box; border: 1px solid #ccc; }
+        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 0.8rem; }
         #captureArea th { background: #eee; }
         
-        #mealDetailWrapper { margin-top: 5px; }
-
-        /* 確認画面の下部固定ボタンエリア */
-        .fixed-bottom-btns {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 10px;
-            box-sizing: border-box;
-            border-top: 1px solid #ddd;
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            z-index: 100;
-        }
-        .fixed-bottom-btns .btn { flex: 1; max-width: 200px; margin: 0; font-size: 1rem; padding: 12px; }
-
-        /* 結果ページ */
-        .result-img { width: 100%; max-width: 360px; border: 2px solid #333; margin-top: 10px; }
-        .guide-box { font-size: 0.85rem; background: #f0f4f8; padding: 12px; border-radius: 8px; border: 1px solid var(--dark-bg); margin-bottom: 10px; line-height: 1.6; text-align: left;}
+        .fixed-bottom-btns { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; z-index: 100; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
 <div id="authPage" class="container">
     <h1>確認</h1>
-    <p style="text-align: left; line-height: 1.6; font-size: 0.9rem;">教会の許可なく帰参届を提出することはできません。<br>内容を確認の上、チェックを入れてください。</p>
     <div class="checkbox-container">
         <input type="checkbox" id="authCheck" onclick="toggleStartBtn()">
-        <label for="authCheck" class="auth-label">
-            私は教会長です。<br>
-            または、<br>
-            帰参届を出すことを教会は了承済みです。
-        </label>
+        <label for="authCheck">教会長である、または帰参届提出の承諾を得ている</label>
     </div>
-    <button id="startBtn" class="btn btn-confirm" style="opacity: 0.3;" disabled onclick="goToInput()">帰参届を作成する</button>
+    <button id="startBtn" class="btn btn-confirm" disabled onclick="goToInput()" style="opacity:0.3">作成する</button>
 </div>
 
-<div id="inputPage" class="container">
-    <h1>帰参届 入力</h1>
-    <label>教会名（団体名）<span class="req">*</span></label><input type="text" id="church">
-    <label>帰参者名（代表）<span class="req">*</span></label><input type="text" id="repName" placeholder="帰参される方の名前">
-    <label>連絡先<span class="req">*</span></label><input type="tel" id="tel" placeholder="帰参される方の連絡先">
-    
-    <label>人数</label>
-    <div class="flex-row">
-        <div><small>大人</small><input type="number" id="pAdult" oninput="calcTotal()" value="0"></div>
-        <div><small>子供</small><input type="number" id="pChild" oninput="calcTotal()" value="0"></div>
-        <div><small>乳児</small><input type="number" id="pBaby" oninput="calcTotal()" value="0"></div>
-    </div>
-    <div id="totalDisplay">合計：0名</div>
-
-    <label>詰所到着予定日時<span class="req">*</span></label>
-    <div class="flex-row"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="time" id="arrTime"></div>
-    <label>詰所出発予定日時<span class="req">*</span></label>
-    <div class="flex-row"><input type="date" id="depDate" onchange="generateMealTable()"><input type="time" id="depTime"></div>
-
-    <label>交通手段</label>
-    <select id="transportMain" onchange="toggleTransport()">
-        <option value="">選択してください</option>
-        <option value="鉄道">鉄道</option>
-        <option value="バス">バス</option>
-        <option value="飛行機">飛行機</option>
-        <option value="自教会">自教会</option>
-        <option value="同乗">同乗</option>
-    </select>
-    
-    <div id="transSubArea" class="hidden">
-        <select id="transportSub" onchange="toggleCarNum()" style="margin-top:10px;"></select>
-    </div>
-
-    <div id="freeInputArea" class="hidden">
-        <label id="freeInputLabel">詳細入力</label>
-        <input type="text" id="transportFree" placeholder="入力してください">
-    </div>
-
-    <div id="carNumArea" class="hidden">
-        <label id="carNumLabel">台数</label>
-        <input type="number" id="carNum">
-    </div>
-
-    <h2>食事・宿泊（実数を記入）</h2>
-    <div id="dateList">日付を入力すると表示されます</div>
-
-    <div class="red-box">
-        <h3 style="color:red; margin:0 0 5px; font-size:1rem;">直属食券申込</h3>
-        <div class="flex-row">
-            <div><small>日付</small><input type="date" id="ticketDate"></div>
-            <div><small>食数</small><input type="number" id="ticketCount" placeholder="0"></div>
-        </div>
-        <div class="caution-text">※直属食券が発行される日、申込〆切日をよくご確認ください。</div>
-    </div>
-    
-    <label>備考</label>
-    <textarea id="memo" rows="3" placeholder="女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
-
-    <button class="btn btn-confirm" onclick="showConfirm()">確認ページへ</button>
-</div>
-
-<div id="confirmPage">
-    <h1 style="text-align:center; background:white; margin:0; padding:10px 0;">内容確認</h1>
-    
-    <div id="confirmScrollArea">
-        <div id="captureArea">
-            <h2 style="text-align: center; margin: 0 0 10px 0; border-bottom: 2px solid #333; padding-bottom: 5px; font-size:1.4rem;">帰参届</h2>
-            <div id="summaryTable"></div>
-            
-            <h3 style="font-size: 0.95rem; margin: 10px 0 0 0; border-left: 4px solid var(--dark-bg); padding-left: 5px;">食事・宿泊明細</h3>
-            <div id="mealDetailWrapper">
-                <div id="mealDetailTable"></div>
-            </div>
-            
-            <div id="ticketArea"></div>
-            
-            <div id="memoArea" style="margin-top:10px; font-size:1rem; border-top:1px dashed #ccc; padding-top:8px; line-height:1.4;"></div>
-            
-            <div style="text-align: right; font-size: 0.6rem; color: #999; margin-top: 15px;">Generated by 帰参届システム</div>
-        </div>
-    </div>
-
-    <div class="fixed-bottom-btns">
-        <button class="btn" onclick="goBack()" style="background:#ccc; color:#333;">修正する</button>
-        <button class="btn btn-next" onclick="makeScreenshot()">次へ (画像作成)</button>
-    </div>
-</div>
-
-<div id="imageResultPage" class="container">
-    <h1>送信用画像 完成</h1>
-    <div class="guide-box">
-        <strong>【送信方法】</strong><br>
-        ◯iPhoneの方：下の画像を長押しして「共有」からメール・LINEで送信。<br>
-        ◯Androidの方：画像部分をスクリーンショットして「共有」からメール・LINEで送信<br>
-        <span style="color:red; font-weight:bold;">◯秩父詰所宛先：chichibu133@gmail.com</span>
-    </div>
-    <div id="imageDisplay" style="text-align: center;"></div>
-    <button class="btn" onclick="backToConfirm()" style="background:#ccc; margin-top:20px;">戻る</button>
-</div>
-
-<script>
-    const getById = (id) => document.getElementById(id);
-    const getAll = (sel) => document.querySelectorAll(sel);
-
-    // 1. 最初の確認ページロジック（復活）
-    function toggleStartBtn() {
-        const checked = getById('authCheck').checked;
-        const btn = getById('startBtn');
-        btn.disabled = !checked;
-        btn.style.opacity = checked ? "1" : "0.3";
-    }
-
-    function goToInput() {
-        getById('authPage').style.display = 'none';
-        getById('inputPage').style.display = 'block';
-        window.scrollTo(0,0);
-    }
-
-    // 2. 入力ページロジック
-    function calcTotal() {
-        const a = Number(getById('pAdult').value || 0);
-        const c = Number(getById('pChild').value || 0);
-        const b = Number(getById('pBaby').value || 0);
-        getById('totalDisplay').innerText = `合計：${a + c + b}名`;
-    }
-
-    // 交通手段（最新版：飛行機、昼夜行、車種対応）
-    function toggleTransport() {
-        const main = getById('transportMain').value;
-        const sub = getById('transportSub');
-        const subArea = getById('transSubArea');
-        const freeArea = getById('freeInputArea');
-        const carArea = getById('carNumArea');
-
-        sub.innerHTML = '<option value="">詳細を選択</option>';
-        freeArea.classList.add('hidden');
-        carArea.classList.add('hidden');
-
-        if (main === "バス") {
-            subArea.classList.remove('hidden');
-            ['昼行', '夜行'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`);
-        } else if (main === "自教会") {
-            subArea.classList.remove('hidden');
-            ['観光バス', 'マイクロバス', '自家用車', '他'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`);
-        } else if (main === "同乗") {
-            subArea.classList.remove('hidden');
-            ['大教会号', '他(同乗先入力)'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`);
-        } else {
-            subArea.classList.add('hidden');
-        }
-    }
-
-    function toggleCarNum() {
-        const main = getById('transportMain').value;
-        const sub = getById('transportSub').value;
-        const carArea = getById('carNumArea');
-        const freeArea = getById('freeInputArea');
-        const freeLabel = getById('freeInputLabel');
-
-        carArea.classList.add('hidden');
-        freeArea.classList.add('hidden');
-
-        if (main === "同乗" && sub === "他(同乗先入力)") {
-            freeArea.classList.remove('hidden');
-            freeLabel.innerText = "同乗先";
-        } else if (main === "自教会" && ["観光バス", "マイクロバス", "自家用車"].includes(sub)) {
-            carArea.classList.remove('hidden');
-            getById('carNumLabel').innerText = sub + " 台数";
-        }
-    }
-
-    // 食事表生成（入力画面：ここは全列表示）
-    function generateMealTable() {
-        const s = getById('arrDate').value;
-        const e = getById('depDate').value;
-        if (!s || !e) return;
-        const start = new Date(s); const end = new Date(e);
-        if (start > end) return;
-
-        let html = '<table><tr><th width="28%">日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th><th>泊(子)</th></tr>';
-        let curr = new Date(start);
-        while (curr <= end) {
-            const d = (curr.getMonth()+1) + '/' + curr.getDate();
-            html += `<tr><td>${d}</td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td><td><input type="number" class="m-in"></td></tr>`;
-            curr.setDate(curr.getDate() + 1);
-        }
-        getById('dateList').innerHTML = html + '</table>';
-    }
-
-    function formatNoYear(dateStr) {
-        if (!dateStr) return "";
-        const d = new Date(dateStr);
-        return (d.getMonth() + 1) + "月" + d.getDate() + "日";
-    }
-
-    // 3. 確認ページロジック（表示処理、レイアウト復元）
-    function showConfirm() {
-        // 必須チェック
-        const req = ['church', 'repName', 'tel', 'arrDate', 'depDate'];
-        if (req.some(id => !getById(id).value)) { alert('必須項目（*）を入力してください'); return; }
-        
-        // 人数、★子供の有無を判定
-        const a = Number(getById('pAdult').value || 0);
-        const c = Number(getById('pChild').value || 0);
-        const b = Number(getById('pBaby').value || 0);
-        const hasChild = c > 0;
-        
-        // 交通手段表示ロジック（最新）
-        const main = getById('transportMain').value;
-        const sub = getById('transportSub').value;
-        const free = getById('transportFree').value || "";
-        const count = getById('carNum').value;
-        
-        let transDisplay = main;
-        if (sub) transDisplay += " (" + sub + ")";
-        if (main === "同乗" && sub === "他(同乗先入力)") transDisplay = "同乗 (" + free + ")";
-        if (main === "自教会" && ["観光バス", "マイクロバス", "自家用車"].includes(sub) && count) transDisplay += " " + count + "台";
-
-        // 基本情報テーブル生成（以前のきれいなレイアウト）
-        getById('summaryTable').innerHTML = `
-            <table>
-                <tr><th width="35%">教会名</th><td>${getById('church').value}</td></tr>
-                <tr><th>帰参者(代表)</th><td>${getById('repName').value}</td></tr>
-                <tr><th>連絡先</th><td>${getById('tel').value}</td></tr>
-                <tr><th>人数</th><td style="font-size:0.9rem;">${a+c+b}名<br>(大${a}/子${c}/乳${b})</td></tr>
-                <tr><th>到着予定</th><td>${formatNoYear(getById('arrDate').value)}<br>${getById('arrTime').value}本当に申し訳ありません。焦って簡略化されたテストコードを統合してしまい、以前のきれいな構成が損なわれてしまいました。
-
-**修正方針：**
-1.  **以前のきれいな確認画面（項目と内容が表形式のもの）を復元**
-2.  **食事・宿泊明細も、視認性の高い以前のレイアウトに戻す**
-3.  **交通手段やその他最新項目の表示ロジックは維持**
-
-こちらを反映し、復元したコードを作成しました。GitHubに上書きをお願いします。
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>帰参届システム</title>
-    <script src="[https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js](https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js)"></script>
-    <style>
-        :root { --main-red: #e74c3c; --dark-bg: #34495e; }
-        body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .flex-row { display: flex; gap: 8px; align-items: center; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; }
-        .btn-confirm { background: var(--dark-bg); color: white; }
-        
-        /* 確認画面・画像化エリア */
-        #confirmPage { padding-bottom: 80px; }
-        #captureArea { background: white; padding: 15px; width: 360px; margin: 0 auto; box-sizing: border-box; border: 1px solid #ccc; }
-        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 0.8rem; }
-        #captureArea th { background: #eee; }
-        
-        .fixed-bottom-btns { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; z-index: 100; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-
-<div id="inputPage" class="container">
+<div id="inputPage" class="container hidden">
     <h1>帰参届 入力</h1>
     <label>教会名</label><input type="text" id="church">
     <label>帰参者名(代表)</label><input type="text" id="repName">
     <label>連絡先</label><input type="tel" id="tel">
-    
     <label>人数</label>
     <div class="flex-row">
         <div><small>大人</small><input type="number" id="pAdult" value="0"></div>
         <div><small>子供</small><input type="number" id="pChild" value="0"></div>
     </div>
-    
     <label>到着・出発日時</label>
     <div class="flex-row"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="date" id="depDate" onchange="generateMealTable()"></div>
-
     <label>交通手段</label>
     <select id="transportMain" onchange="toggleTransport()">
         <option value="">選択してください</option>
@@ -395,7 +64,6 @@
 
     <h2>食事・宿泊（実数を記入）</h2>
     <div id="dateList"></div>
-
     <label>備考</label>
     <textarea id="memo" rows="3"></textarea>
     <button class="btn btn-confirm" onclick="showConfirm()">確認ページへ</button>
@@ -423,123 +91,8 @@
 
 <script>
     const getById = (id) => document.getElementById(id);
-    function toggleTransport() {
-        const main = getById('transportMain').value, sub = getById('transportSub'), area = getById('transSubArea');
-        sub.innerHTML = '<option value="">詳細選択</option>'; getById('carNumArea').classList.add('hidden');
-        if (main === "バス") { area.classList.remove('hidden'); ['昼行', '夜行'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`); }
-        else if (main === "自教会") { area.classList.remove('hidden'); ['観光バス', '自家用車'].forEach(v => sub.innerHTML += `<option value="${v}">${v}</option>`); }
-        else area.classList.add('hidden');
-    }
-    function toggleCarNum() {
-        const main = getById('transportMain').value, sub = getById('transportSub').value;
-        if (main === "自教会" && ["観光バス", "自家用車"].includes(sub)) { getById('carNumArea').classList.remove('hidden'); getById('carNumLabel').innerText = sub + " 台数"; }
-        else getById('carNumArea').classList.add('hidden');
-    }
-    function generateMealTable() {
-        const s = getById('arrDate').value, e = getById('depDate').value;
-        const hasChild = Number(getById('pChild').value) > 0;
-        if (!s || !e) return;
-        let html = '<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>';
-        if(hasChild) html += '<th>泊(子)</th>';
-        html += '</tr>';
-        let curr = new Date(s), end = new Date(e);
-        while (curr <= end) {
-            html += `<tr><td>${curr.getMonth()+1}/${curr.getDate()}本当申し訳ありません。焦って簡略化されたテストコードを統合してしまい、以前のきれいな構成が損なわれてしまいました。
-
-**修正方針：**
-1.  **以前のきれいな確認画面（項目と内容が表形式のもの）を復元**
-2.  **食事・宿泊明細も、視認性の高い以前のレイアウトに戻す**
-3.  **交通手段やその他最新項目の表示ロジックは維持**
-
-こちらを反映し、復元したコードを作成しました。GitHubに上書きをお願いします。
-
-```html
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>帰参届システム</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <style>
-        :root { --main-red: #e74c3c; --dark-bg: #34495e; }
-        body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
-        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .flex-row { display: flex; gap: 8px; align-items: center; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; }
-        .btn-confirm { background: var(--dark-bg); color: white; }
-        
-        /* 確認画面・画像化エリア */
-        #confirmPage { padding-bottom: 80px; }
-        #captureArea { background: white; padding: 15px; width: 360px; margin: 0 auto; box-sizing: border-box; border: 1px solid #ccc; }
-        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; }
-        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 5px; text-align: center; font-size: 0.8rem; }
-        #captureArea th { background: #eee; }
-        
-        .fixed-bottom-btns { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; z-index: 100; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-
-<div id="inputPage" class="container">
-    <h1>帰参届 入力</h1>
-    <label>教会名</label><input type="text" id="church">
-    <label>帰参者名(代表)</label><input type="text" id="repName">
-    <label>連絡先</label><input type="tel" id="tel">
-    
-    <label>人数</label>
-    <div class="flex-row">
-        <div><small>大人</small><input type="number" id="pAdult" value="0"></div>
-        <div><small>子供</small><input type="number" id="pChild" value="0"></div>
-    </div>
-    
-    <label>到着・出発日時</label>
-    <div class="flex-row"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="date" id="depDate" onchange="generateMealTable()"></div>
-
-    <label>交通手段</label>
-    <select id="transportMain" onchange="toggleTransport()">
-        <option value="">選択してください</option>
-        <option value="鉄道">鉄道</option>
-        <option value="バス">バス</option>
-        <option value="自教会">自教会</option>
-    </select>
-    <div id="transSubArea" class="hidden"><select id="transportSub" onchange="toggleCarNum()" style="margin-top:10px;"></select></div>
-    <div id="carNumArea" class="hidden"><label id="carNumLabel">台数</label><input type="number" id="carNum"></div>
-
-    <h2>食事・宿泊（実数を記入）</h2>
-    <div id="dateList"></div>
-
-    <label>備考</label>
-    <textarea id="memo" rows="3"></textarea>
-    <button class="btn btn-confirm" onclick="showConfirm()">確認ページへ</button>
-</div>
-
-<div id="confirmPage" class="hidden">
-    <div id="captureArea">
-        <h2 style="text-align:center;">帰参届</h2>
-        <div id="summaryTable"></div>
-        <h3 style="font-size:1rem; border-bottom:1px solid #333;">食事・宿泊明細</h3>
-        <div id="mealDetailTable"></div>
-        <div id="memoArea" style="margin-top:10px; font-size:0.9rem;"></div>
-    </div>
-    <div class="fixed-bottom-btns">
-        <button class="btn" onclick="goBack()" style="background:#eee;">修正</button>
-        <button class="btn btn-confirm" onclick="makeScreenshot()">画像作成</button>
-    </div>
-</div>
-
-<div id="imageResultPage" class="container hidden">
-    <h1>完成</h1>
-    <div id="imageDisplay" style="text-align:center;"></div>
-    <button class="btn" onclick="location.reload()">最初に戻る</button>
-</div>
-
-<script>
-    const getById = (id) => document.getElementById(id);
+    function toggleStartBtn() { const c = getById('authCheck').checked; getById('startBtn').disabled = !c; getById('startBtn').style.opacity = c ? "1" : "0.3"; }
+    function goToInput() { getById('authPage').classList.add('hidden'); getById('inputPage').classList.remove('hidden'); }
     function toggleTransport() {
         const main = getById('transportMain').value, sub = getById('transportSub'), area = getById('transSubArea');
         sub.innerHTML = '<option value="">詳細選択</option>'; getById('carNumArea').classList.add('hidden');
