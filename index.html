@@ -6,37 +6,41 @@
     <title>帰参届システム</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
+        :root { --main-red: #e74c3c; --dark-bg: #34495e; }
         body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 20px; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 1rem; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; font-size: 1.1rem; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 20px; font-size: 1.1rem; background: #34495e; color: white; }
+        .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding-bottom: 20px; }
+        h1 { text-align: center; font-size: 1.6rem; margin-bottom: 10px; }
+        label { display: block; margin-top: 8px; font-weight: bold; font-size: 0.85rem; }
+        .req { color: red; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
+        .flex-row { display: flex; gap: 8px; align-items: center; }
+        .flex-row div { flex: 1; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn-confirm { background: var(--dark-bg); color: white; }
         
-        #captureArea { background: white; padding: 20px; width: 400px; margin: 0 auto; border: 1px solid #ddd; }
-        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        #captureArea th, #captureArea td { border: 1px solid #999; padding: 8px; text-align: center; font-size: 1rem; }
+        #inputPage, #confirmPage, #imageResultPage { display: none; }
+        #confirmPage { padding-bottom: 80px; }
+        #captureArea { background: white; padding: 15px; width: 360px; margin: 0 auto; border: 1px solid #eee; }
+        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
+        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 4px 2px; text-align: center; font-size: 0.8rem; }
         #captureArea th { background: #eee; }
-        
-        .hidden { display: none; }
+        .fixed-bottom-btns { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; z-index: 100; }
     </style>
 </head>
 <body>
 
-<div id="inputPage" class="container">
+<div id="inputPage" class="container" style="display:block;">
     <h1>帰参届 入力</h1>
-    <label>教会名</label><input type="text" id="church">
-    <label>帰参者名(代表)</label><input type="text" id="repName">
+    <label>教会名<span class="req">*</span></label><input type="text" id="church">
+    <label>帰参者名(代表)<span class="req">*</span></label><input type="text" id="repName">
+    <label>連絡先<span class="req">*</span></label><input type="tel" id="tel">
     <label>人数</label>
-    <div style="display:flex; gap:10px;">
-        <input type="number" id="pAdult" placeholder="大人">
-        <input type="number" id="pChild" placeholder="子供" oninput="generateMealTable()">
+    <div class="flex-row">
+        <div><small>大人</small><input type="number" id="pAdult" value="0"></div>
+        <div><small>子供</small><input type="number" id="pChild" value="0" oninput="generateMealTable()"></div>
     </div>
-    
-    <label>到着・出発日時</label>
-    <input type="date" id="arrDate" onchange="generateMealTable()">
-    <input type="date" id="depDate" onchange="generateMealTable()">
-
+    <label>到着日時</label><div class="flex-row"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="time" id="arrTime"></div>
+    <label>出発日時</label><div class="flex-row"><input type="date" id="depDate" onchange="generateMealTable()"><input type="time" id="depTime"></div>
     <label>交通手段</label>
     <select id="transportMain">
         <option value="鉄道">鉄道</option>
@@ -45,23 +49,29 @@
         <option value="自教会">自教会</option>
         <option value="同乗">同乗</option>
     </select>
-
     <h2>食事・宿泊</h2>
     <div id="dateList"></div>
-
-    <label>備考</label>
-    <textarea id="memo" rows="3"></textarea>
-    <button class="btn" onclick="showConfirm()">確認ページへ</button>
+    <label>備考</label><textarea id="memo" rows="3"></textarea>
+    <button class="btn btn-confirm" onclick="showConfirm()">確認ページへ</button>
 </div>
 
-<div id="confirmPage" class="container hidden">
+<div id="confirmPage">
     <div id="captureArea">
+        <h2 style="text-align:center;">帰参届</h2>
         <div id="summaryTable"></div>
         <div id="mealDetailTable"></div>
-        <div id="memoArea" style="margin-top:15px;"></div>
+        <div id="memoArea" style="margin-top:10px;"></div>
     </div>
-    <button class="btn" onclick="location.reload()" style="background:#ccc; color:#000;">修正する</button>
-    <button class="btn" onclick="makeScreenshot()">画像作成</button>
+    <div class="fixed-bottom-btns">
+        <button class="btn" onclick="document.getElementById('confirmPage').style.display='none'; document.getElementById('inputPage').style.display='block';" style="background:#ccc;">修正</button>
+        <button class="btn btn-confirm" onclick="makeScreenshot()">画像作成</button>
+    </div>
+</div>
+
+<div id="imageResultPage">
+    <h1 style="text-align:center;">完成</h1>
+    <div id="imageDisplay" style="text-align:center;"></div>
+    <button class="btn" onclick="location.reload()">最初に戻る</button>
 </div>
 
 <script>
@@ -78,32 +88,29 @@
         }
         document.getElementById('dateList').innerHTML = html + '</table>';
     }
-
     function showConfirm() {
-        document.getElementById('summaryTable').innerHTML = `<h3>帰参届</h3>教会: ${document.getElementById('church').value}<br>代表: ${document.getElementById('repName').value}<br>交通: ${document.getElementById('transportMain').value}`;
-        
+        document.getElementById('summaryTable').innerHTML = `教会:${document.getElementById('church').value}<br>代表:${document.getElementById('repName').value}<br>交通:${document.getElementById('transportMain').value}`;
         let mRows = ""; 
         document.querySelectorAll('#dateList tr').forEach((tr, i) => { 
             if(i>0) {
-                let row = "<tr>";
+                mRows += "<tr>";
                 tr.querySelectorAll('td').forEach((td, idx) => {
-                    if(idx === 0) row += `<td>${td.innerText}</td>`;
+                    if(idx === 0) mRows += `<td>${td.innerText}</td>`;
                     else {
                         let val = td.querySelector('input').value;
-                        row += `<td>${val == 0 || val == "" ? "" : val}</td>`;
+                        mRows += `<td>${val == 0 || val == "" ? "" : val}</td>`;
                     }
                 });
-                mRows += row + "</tr>";
+                mRows += "</tr>";
             }
         });
         document.getElementById('mealDetailTable').innerHTML = `<table>${document.querySelector('#dateList table tr').outerHTML}${mRows}</table>`;
         document.getElementById('memoArea').innerHTML = `<strong>備考:</strong> ${document.getElementById('memo').value}`;
-        document.getElementById('inputPage').classList.add('hidden'); document.getElementById('confirmPage').classList.remove('hidden');
+        document.getElementById('inputPage').style.display = 'none'; document.getElementById('confirmPage').style.display = 'block';
     }
-
     async function makeScreenshot() {
-        const canvas = await html2canvas(document.getElementById('captureArea'), { scale: 2 });
-        document.body.innerHTML = `<div style="text-align:center;"><h1>画像完成</h1><img src="${canvas.toDataURL("image/png")}" style="width:100%; max-width:400px;"><br><button class="btn" onclick="location.reload()">最初に戻る</button></div>`;
+        const canvas = await html2canvas(document.getElementById('captureArea'), { scale: 3 });
+        document.body.innerHTML = `<div style="text-align:center;"><h1>画像完成</h1><img src="${canvas.toDataURL("image/png")}" style="width:100%; max-width:360px;"><br><button class="btn" onclick="location.reload()">最初に戻る</button></div>`;
     }
 </script>
 </body>
