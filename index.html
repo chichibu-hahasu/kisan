@@ -2,122 +2,95 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>帰参届システム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>帰参届</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
-        .container { max-width: 500px; margin: auto; background: white; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        h1, h2 { text-align: center; }
-        label { display: block; margin-top: 15px; font-weight: bold; }
-        .req { color: red; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1.1rem; background: #34495e; color: white; }
-        
-        #authPage, #inputPage, #confirmPage, #imageResultPage { display: none; }
-        #captureArea { background: white; padding: 20px; width: 360px; margin: 0 auto; border: 1px solid #ccc; }
-        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 8px; text-align: center; font-size: 1.1rem; }
-        #captureArea th { background: #f0f0f0; }
+        body { font-family: sans-serif; padding: 10px; }
+        .container { max-width: 400px; margin: auto; }
+        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; margin-top: 10px; border: none; background: #333; color: white; font-weight: bold; }
+        #captureArea { width: 360px; background: white; padding: 20px; border: 1px solid #000; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        th, td { border: 1px solid #000; padding: 5px; text-align: center; }
+        .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="authPage" class="container" style="display:block;">
-    <h1>確認</h1>
-    <p style="color:red; font-weight:bold;">※教会の許可なく帰参届を提出することはできません。</p>
-    <div style="background:#fff5f5; padding:15px; border-radius:8px; margin:20px 0;">
-        <input type="checkbox" id="authCheck" onclick="document.getElementById('startBtn').disabled=!this.checked">
-        <label for="authCheck">私は、教会長です。または帰参届提出の承諾を得ています。</label>
-    </div>
-    <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').style.display='none'; document.getElementById('inputPage').style.display='block';">作成する</button>
-</div>
-
 <div id="inputPage" class="container">
-    <h1>帰参届入力</h1>
-    <p style="color:red;">※は必須項目です。</p>
-    <label><span class="req">*</span>教会名</label><input type="text" id="church">
-    <label><span class="req">*</span>帰参者名(代表)</label><input type="text" id="repName">
-    <label><span class="req">*</span>連絡先</label><input type="tel" id="tel">
-    <label><span class="req">*</span>人数</label>
-    <div style="display:flex; gap:5px;"><input type="number" id="pAdult" placeholder="大人"><input type="number" id="pChild" placeholder="子供" oninput="generateMealTable()"><input type="number" id="pBaby" placeholder="乳児"></div>
-    <label><span class="req">*</span>詰所到着日時</label>
-    <div style="display:flex; gap:5px;"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="time" id="arrTime"></div>
-    <label><span class="req">*</span>詰所出発日時</label>
-    <div style="display:flex; gap:5px;"><input type="date" id="depDate" onchange="generateMealTable()"><input type="time" id="depTime"></div>
-    
-    <label><span class="req">*</span>交通手段</label>
-    <select id="transportMain" onchange="toggleTransport()"><option value="">選択して下さい</option><option value="鉄道">鉄道</option><option value="バス">バス</option><option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option></select>
-    <select id="transportSub" class="hidden" onchange="showCarNum()" style="margin-top:10px;"></select>
-    <input type="number" id="carNum" class="hidden" placeholder="台数">
-    <input type="text" id="extraInput" class="hidden" placeholder="入力して下さい">
-    
-    <h2>食事・宿泊明細</h2>
-    <div id="dateList"></div>
-    
-    <div style="border:1px solid red; padding:10px; margin:15px 0; border-radius:8px;">
-        <label>直属食券申込</label>
-        <div style="display:flex; gap:5px;"><input type="date" id="ticketDate"><input type="number" id="ticketCount" placeholder="食数"></div>
-        <p style="color:red; font-size:0.8rem;">※直属食券が発行される日、申込〆切日をよくご確認ください。</p>
+    <h2>帰参届入力</h2>
+    <label>教会名</label><input type="text" id="church">
+    <label>帰参者名(代表)</label><input type="text" id="repName">
+    <label>連絡先</label><input type="tel" id="tel">
+    <label>人数 (大/子/乳)</label>
+    <div style="display:flex; gap:5px;">
+        <input type="number" id="pA" placeholder="大"><input type="number" id="pC" placeholder="子" oninput="genTable()">
+        <input type="number" id="pB" placeholder="乳">
     </div>
-    <label>備考</label><textarea id="memo" rows="3"></textarea>
+    <label>詰所到着日時</label><input type="date" id="arrD"><input type="time" id="arrT">
+    <label>詰所出発日時</label><input type="date" id="depD"><input type="time" id="depT">
+    <label>交通手段</label>
+    <select id="trans" onchange="toggleT()">
+        <option value="">選択して下さい</option><option value="バス">バス</option>
+        <option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option>
+    </select>
+    <div id="subT" class="hidden"></div>
+    <div id="dateList"></div>
+    <label>備考</label><textarea id="memo" rows="3">※女性部屋希望、別席・願書等ある方もこちらにご記入下さい。</textarea>
     <button class="btn" onclick="showConfirm()">確認ページへ</button>
 </div>
 
-<div id="confirmPage">
+<div id="confirmPage" class="container hidden">
+    <h2>確認ページ</h2>
     <div id="captureArea">
-        <h2>確認ページ</h2>
-        <div id="summaryTable" style="font-size:1.2rem; line-height:1.8;"></div>
-        <div id="mealDetailTable"></div>
-        <div id="memoArea" style="margin-top:10px; font-size:1.1rem;"></div>
+        <h2 style="text-align:center;">帰参届</h2>
+        <div id="resSum" style="font-size:1.2rem;"></div>
+        <h3 style="border-bottom:2px solid #000;">食事・宿泊明細</h3>
+        <div id="resTable"></div>
+        <div id="resMemo" style="margin-top:10px;"></div>
     </div>
-    <p style="text-align:center;">よろしければ、画像作成ボタンを押して下さい。</p>
-    <div style="display:flex; gap:10px; padding:0 20px;">
-        <button class="btn" onclick="document.getElementById('confirmPage').style.display='none'; document.getElementById('inputPage').style.display='block';" style="background:#ccc;">修正</button>
-        <button class="btn" onclick="makeScreenshot()">画像作成</button>
-    </div>
-</div>
-
-<div id="imageResultPage" class="container">
-    <h1>送信用画像</h1>
-    <div id="imageDisplay" style="text-align:center;"></div>
-    <p style="font-size:0.9rem;"><strong>送信方法:</strong><br>iPhone: ワンタップ後長押しから「共有」でLINE/メール。<br>Android: スクリーンショットから共有。<br><strong>宛先：秩父詰所 chichibu133@gmail.com</strong></p>
-    <button class="btn" onclick="finish()">終了</button>
+    <button class="btn" style="background:#888;" onclick="backEdit()">修正</button>
+    <button class="btn" onclick="snap()">画像作成</button>
 </div>
 
 <script>
-    function toggleTransport(){
-        const m=document.getElementById('transportMain').value, s=document.getElementById('transportSub'), ex=document.getElementById('extraInput'), c=document.getElementById('carNum');
-        s.classList.add('hidden'); ex.classList.add('hidden'); c.classList.add('hidden');
-        if(m==='バス'){s.classList.remove('hidden'); s.innerHTML='<option>昼行</option><option>夜行</option>';}
-        else if(m==='自教会'){s.classList.remove('hidden'); s.innerHTML='<option>自家用車</option><option>マイクロバス</option><option>観光バス</option>'; c.classList.remove('hidden');}
-        else if(m==='同乗'){s.classList.remove('hidden'); s.innerHTML='<option>大教会号</option><option>他教会</option>';}
-        else if(m==='他'){ex.classList.remove('hidden');}
+    function toggleT(){
+        const v = document.getElementById('trans').value;
+        const sub = document.getElementById('subT');
+        sub.innerHTML = ""; sub.classList.remove('hidden');
+        if(v==='バス') sub.innerHTML='<select><option>昼行</option><option>夜行</option></select>';
+        else if(v==='自教会') sub.innerHTML='<select><option>自家用車</option><option>マイクロバス</option><option>観光バス</option></select><input type="number" placeholder="台数">';
+        else if(v==='同乗') sub.innerHTML='<select><option>大教会号</option><option>他教会</option></select>';
+        else if(v==='他') sub.innerHTML='<input type="text" placeholder="入力して下さい">';
+        else sub.classList.add('hidden');
     }
-    function showCarNum(){ const s=document.getElementById('transportSub').value; document.getElementById('extraInput').style.display=(s==='他教会')?'block':'none'; }
-    function generateMealTable(){
-        const s=document.getElementById('arrDate').value, e=document.getElementById('depDate').value, c=Number(document.getElementById('pChild').value||0)>0;
-        if(!s||!e) return;
-        let html='<table><tr><th>日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th>'+(c?'<th>泊(子)</th>':'')+'</tr>';
-        let d=new Date(s), end=new Date(e);
-        while(d<=end){ html+=`<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td>`+(c?'<td><input type="number"></td>':'')+'</tr>'; d.setDate(d.getDate()+1); }
-        document.getElementById('dateList').innerHTML=html+'</table>';
+    function genTable(){
+        const start = document.getElementById('arrD').value, end = document.getElementById('depD').value;
+        if(!start || !end) return;
+        let html = '<table><tr><th>日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th>' + (document.getElementById('pC').value>0?'<th>泊(子)</th>':'') + '</tr>';
+        let d = new Date(start), e = new Date(end);
+        while(d <= e){
+            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td><td><input type="number"></td>` + (document.getElementById('pC').value>0?'<td><input type="number"></td>':'') + '</tr>';
+            d.setDate(d.getDate()+1);
+        }
+        document.getElementById('dateList').innerHTML = html + '</table>';
     }
     function showConfirm(){
-        const req=['church','repName','tel','arrDate','depDate','transportMain'];
-        if(req.some(id=>!document.getElementById(id).value)){ alert('必須項目が入力されていません。'); return; }
-        const f=(d)=>new Date(d).getMonth()+1+'月'+new Date(d).getDate()+'日';
-        document.getElementById('summaryTable').innerHTML=`教会名: ${document.getElementById('church').value}<br>帰参者名(代表): ${document.getElementById('repName').value}<br>人数: 大${document.getElementById('pAdult').value}・子${document.getElementById('pChild').value}・乳${document.getElementById('pBaby').value}<br>到着: ${f(document.getElementById('arrDate').value)} ${document.getElementById('arrTime').value}<br>出発: ${f(document.getElementById('depDate').value)} ${document.getElementById('depTime').value}<br>交通手段: ${document.getElementById('transportMain').value}`;
-        document.getElementById('mealDetailTable').innerHTML=document.getElementById('dateList').innerHTML;
-        document.getElementById('memoArea').innerHTML=`<strong>備考:</strong><br>${document.getElementById('memo').value}<br><br>※直属食券:${document.getElementById('ticketDate').value} ${document.getElementById('ticketCount').value}枚`;
-        document.getElementById('inputPage').style.display='none'; document.getElementById('confirmPage').style.display='block';
+        document.getElementById('resSum').innerHTML = `教会名: ${document.getElementById('church').value}<br>代表: ${document.getElementById('repName').value}<br>交通: ${document.getElementById('trans').value}`;
+        document.getElementById('resTable').innerHTML = document.getElementById('dateList').innerHTML;
+        document.getElementById('resMemo').innerHTML = document.getElementById('memo').value;
+        document.getElementById('inputPage').classList.add('hidden');
+        document.getElementById('confirmPage').classList.remove('hidden');
     }
-    async function makeScreenshot(){
-        const canvas=await html2canvas(document.getElementById('captureArea'),{scale:3});
-        document.getElementById('confirmPage').style.display='none'; document.getElementById('imageResultPage').style.display='block';
-        document.getElementById('imageDisplay').innerHTML=`<img src="${canvas.toDataURL()}" style="width:100%">`;
+    function backEdit(){
+        document.getElementById('inputPage').classList.remove('hidden');
+        document.getElementById('confirmPage').classList.add('hidden');
     }
-    function finish(){ if(confirm('詰所または村田さんへLINEかメールで送りましたか？')) location.reload(); }
+    async function snap(){
+        const canvas = await html2canvas(document.getElementById('captureArea'));
+        document.body.innerHTML = `<img src="${canvas.toDataURL()}" style="width:100%"><button class="btn" onclick="location.reload()">終了</button>`;
+    }
 </script>
 </body>
 </html>
