@@ -6,69 +6,69 @@
     <title>帰参届システム</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: sans-serif; background: #fdfdfd; padding: 15px; color: #333; }
-        .container { max-width: 450px; margin: auto; background: #fff; padding: 25px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-        h1, h2 { text-align: center; color: #2c3e50; }
-        label { display: block; margin-top: 15px; font-weight: bold; font-size: 1.05rem; }
-        input, select, textarea { width: 100%; padding: 12px; margin-top: 6px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; }
-        .btn { width: 100%; padding: 18px; margin-top: 20px; border: none; background: #27ae60; color: white; font-weight: bold; font-size: 1.1rem; border-radius: 8px; cursor: pointer; }
+        body { font-family: sans-serif; background: #f9f9f9; padding: 10px; color: #222; }
+        .container { max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        h1, h2 { text-align: center; margin-top: 0; }
+        label { display: block; margin-top: 15px; font-weight: bold; }
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1.1rem; background: #333; color: #fff; }
         
-        #captureArea { width: 360px; background: white; padding: 20px; border: 1px solid #ddd; margin: 0 auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-        th, td { border: 1px solid #999; padding: 6px; text-align: center; }
+        #captureArea { background: white; padding: 15px; width: 340px; border: 1px solid #000; margin: auto; }
+        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; }
+        th, td { border: 1px solid #000; padding: 4px; text-align: center; }
+        th { background: #eee; }
         .hidden { display: none; }
-        .req { color: #e74c3c; }
     </style>
 </head>
 <body>
 
 <div id="authPage" class="container">
     <h1>確認</h1>
-    <p style="color:#c0392b; font-size:0.9rem; font-weight:bold;">※教会の許可なく帰参届を提出することはできません。</p>
+    <p style="color:#d32f2f; font-size:0.9rem; font-weight:bold;">※教会の許可なく帰参届を提出することはできません。</p>
     <input type="checkbox" id="authCheck" onclick="document.getElementById('startBtn').disabled=!this.checked">
-    <label style="display:inline; font-size:1rem;" for="authCheck">私は、教会長です。または帰参届提出の承諾を得ています。</label>
-    <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').style.display='none'; document.getElementById('inputPage').style.display='block';">作成する</button>
+    <label style="display:inline;" for="authCheck">私は、教会長です。または帰参届提出の承諾を得ています。</label>
+    <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').classList.add('hidden'); document.getElementById('inputPage').classList.remove('hidden');">作成する</button>
 </div>
 
 <div id="inputPage" class="container hidden">
-    <h1>帰参届入力</h1>
-    <p style="color:#e74c3c; font-weight:bold;">※は必須項目です。</p>
-    <label><span class="req">*</span>教会名</label><input type="text" id="church">
-    <label><span class="req">*</span>帰参者名(代表)</label><input type="text" id="repName">
-    <label><span class="req">*</span>連絡先</label><input type="tel" id="tel">
-    <label><span class="req">*</span>人数</label>
+    <h2>帰参届入力</h2>
+    <p style="color:red; font-size:0.8rem;">※は必須項目です。</p>
+    <label><span style="color:red;">*</span>教会名</label><input type="text" id="church">
+    <label><span style="color:red;">*</span>帰参者名(代表)</label><input type="text" id="repName">
+    <label><span style="color:red;">*</span>連絡先</label><input type="tel" id="tel">
+    <label><span style="color:red;">*</span>人数</label>
     <div style="display:flex; gap:5px;"><input type="number" id="pA" placeholder="大人"><input type="number" id="pC" placeholder="子供" oninput="genTable()"><input type="number" id="pB" placeholder="乳児"></div>
-    <label><span class="req">*</span>詰所到着日時</label>
-    <div style="display:flex; gap:5px;"><input type="date" id="arrD" onchange="genTable()"><input type="time" id="arrT"></div>
-    <label><span class="req">*</span>詰所出発日時</label>
-    <div style="display:flex; gap:5px;"><input type="date" id="depD" onchange="genTable()"><input type="time" id="depT"></div>
-    <label><span class="req">*</span>交通手段</label>
+    <label><span style="color:red;">*</span>詰所到着日時</label><input type="date" id="arrD" onchange="genTable()"><input type="time" id="arrT">
+    <label><span style="color:red;">*</span>詰所出発日時</label><input type="date" id="depD" onchange="genTable()"><input type="time" id="depT">
+    <label><span style="color:red;">*</span>交通手段</label>
     <select id="trans" onchange="toggleT()"><option value="">選択して下さい</option><option value="鉄道">鉄道</option><option value="バス">バス</option><option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option></select>
     <div id="subT" class="hidden"></div>
-    
-    <h2>食事・宿泊明細</h2>
+    <h3>食事・宿泊明細</h3>
     <div id="dateList"></div>
-    
-    <label>直属食券</label>
-    <div style="display:flex; gap:5px;"><input type="date" id="tDate"><input type="number" id="tCount" placeholder="食数"></div>
-    <p style="color:red; font-size:0.8rem;">※直属食券が発行される日、申込〆切日をよくご確認ください。</p>
-    
-    <label>備考</label>
-    <textarea id="memo" rows="3" placeholder="※女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
+    <label>直属食券</label><div style="display:flex; gap:5px;"><input type="date" id="tDate"><input type="number" id="tCount" placeholder="食数"></div>
+    <p style="color:red; font-size:0.7rem;">※直属食券が発行される日、申込〆切日をよくご確認ください。</p>
+    <label>備考</label><textarea id="memo" rows="3" placeholder="※女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
     <button class="btn" onclick="showConfirm()">確認ページへ</button>
 </div>
 
 <div id="confirmPage" class="container hidden">
-    <h2 style="margin-top:0;">確認ページ</h2>
+    <h2>確認ページ</h2>
     <div id="captureArea">
-        <h2 style="margin-top:0;">帰参届</h2>
-        <div id="resSum" style="font-size:1rem; line-height:1.5;"></div>
-        <h3 style="margin:15px 0 5px 0;">食事・宿泊明細</h3>
+        <h2 style="margin:0;">帰参届</h2>
+        <div id="resSum" style="font-size:0.9rem; line-height:1.4;"></div>
+        <h3 style="margin:10px 0 0 0;">食事・宿泊明細</h3>
         <div id="resTable"></div>
-        <div id="resMemo" style="margin-top:10px; font-size:0.9rem;"></div>
+        <div id="resMemo" style="font-size:0.8rem;"></div>
     </div>
-    <button class="btn" style="background:#95a5a6;" onclick="backEdit()">修正</button>
+    <button class="btn" style="background:#888;" onclick="backEdit()">修正</button>
     <button class="btn" onclick="snap()">画像作成</button>
+</div>
+
+<div id="resultPage" class="container hidden">
+    <h2 id="inst">送信用画像</h2>
+    <div id="imageDisplay" style="text-align:center;"></div>
+    <p id="method" style="font-size:0.8rem;"></p>
+    <button class="btn" onclick="location.reload()">終了</button>
 </div>
 
 <script>
@@ -77,34 +77,36 @@
         sub.innerHTML = ""; sub.classList.remove('hidden');
         if(v==='バス') sub.innerHTML='<select><option>昼行</option><option>夜行</option></select>';
         else if(v==='自教会') sub.innerHTML='<select><option>自家用車</option><option>マイクロバス</option><option>観光バス</option></select><input type="number" placeholder="台数">';
-        else if(v==='同乗') sub.innerHTML='<select id="dSet" onchange="checkOther()"><option>大教会号</option><option>他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="教会名">';
+        else if(v==='同乗') sub.innerHTML='<select id="dSet" onchange="checkOther()"><option>大教会号</option><option>他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="他教会名">';
         else if(v==='他') sub.innerHTML='<input type="text" placeholder="交通手段">';
         else sub.classList.add('hidden');
     }
     function checkOther(){ document.getElementById('otherChurch').className = document.getElementById('dSet').value==='他教会'?'':'hidden'; }
     function genTable(){
-        const start = document.getElementById('arrD').value, end = document.getElementById('depD').value;
-        if(!start || !end) return;
-        let html = '<table><tr><th>日付</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th>' + (document.getElementById('pC').value>0?'<th>泊(子)</th>':'') + '</tr>';
-        let d = new Date(start), e = new Date(end);
-        while(d <= e){
-            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td>` + (document.getElementById('pC').value>0?'<td><input type="number" style="width:30px"></td>':'') + '</tr>';
+        const s = document.getElementById('arrD').value, e = document.getElementById('depD').value;
+        if(!s||!e) return;
+        let html = '<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th>'+(document.getElementById('pC').value>0?'<th>泊(子)</th>':'')+'</tr>';
+        let d = new Date(s), end = new Date(e);
+        while(d<=end){
+            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td>`+(document.getElementById('pC').value>0?'<td><input type="number" style="width:30px"></td>':'')+'</tr>';
             d.setDate(d.getDate()+1);
         }
-        document.getElementById('dateList').innerHTML = html + '</table>';
+        document.getElementById('dateList').innerHTML = html+'</table>';
     }
     function showConfirm(){
-        const church = document.getElementById('church').value, rep = document.getElementById('repName').value, tel = document.getElementById('tel').value;
-        const arr = document.getElementById('arrD').value+' '+document.getElementById('arrT').value, dep = document.getElementById('depD').value+' '+document.getElementById('depT').value;
-        document.getElementById('resSum').innerHTML = `<strong>教会名:</strong> ${church}<br><strong>帰参者名(代表):</strong> ${rep}<br><strong>連絡先:</strong> ${tel}<br><strong>人数:</strong> 大${document.getElementById('pA').value}・子${document.getElementById('pC').value}・乳${document.getElementById('pB').value}<br><strong>詰所到着:</strong> ${arr}<br><strong>詰所出発:</strong> ${dep}<br><strong>交通手段:</strong> ${document.getElementById('trans').value}`;
+        const inputs = document.querySelectorAll('input, select, textarea');
+        const vals = {}; inputs.forEach(i => vals[i.id] = i.value);
+        document.getElementById('resSum').innerHTML = `教会名: ${vals.church}<br>代表: ${vals.repName}<br>連絡: ${vals.tel}<br>人数: 大${vals.pA}・子${vals.pC}・乳${vals.pB}<br>到着: ${vals.arrD} ${vals.arrT}<br>出発: ${vals.depD} ${vals.depT}<br>交通: ${vals.trans}`;
         document.getElementById('resTable').innerHTML = document.getElementById('dateList').innerHTML;
-        document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${document.getElementById('memo').value}<br><br><strong>直属食券:</strong> ${document.getElementById('tDate').value} ${document.getElementById('tCount').value}枚`;
+        document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${vals.memo}<br><strong>直属食券:</strong> ${vals.tDate} ${vals.tCount}枚`;
         document.getElementById('inputPage').classList.add('hidden'); document.getElementById('confirmPage').classList.remove('hidden');
     }
     function backEdit(){ document.getElementById('inputPage').classList.remove('hidden'); document.getElementById('confirmPage').classList.add('hidden'); }
     async function snap(){
         const canvas = await html2canvas(document.getElementById('captureArea'));
-        document.body.innerHTML = `<h1>送信用画像</h1><img src="${canvas.toDataURL()}" style="width:100%"><p>iPhone:長押しで共有 / Android:スクショで共有<br>宛先: 秩父詰所 chichibu133@gmail.com</p><button class="btn" onclick="location.reload()">終了</button>`;
+        document.getElementById('confirmPage').classList.add('hidden'); document.getElementById('resultPage').classList.remove('hidden');
+        document.getElementById('imageDisplay').innerHTML = `<img src="${canvas.toDataURL()}" style="width:100%">`;
+        document.getElementById('method').innerHTML = "<strong>送信方法:</strong><br>iPhoneの方：帰参届部分を長押しから「共有」してLINE/メール。<br>Androidの方：スクリーンショットを撮影後、共有。<br><strong>宛先：秩父詰所 chichibu133@gmail.com</strong>";
     }
 </script>
 </body>
