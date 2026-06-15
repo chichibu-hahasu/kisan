@@ -9,27 +9,36 @@
         :root { --main-red: #e74c3c; --dark-bg: #34495e; }
         body { font-family: sans-serif; background: #f4f7f6; padding: 10px; margin: 0; }
         .container { max-width: 500px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding-bottom: 20px; }
-        h1 { text-align: center; font-size: 1.6rem; margin-bottom: 10px; }
-        label { display: block; margin-top: 8px; font-weight: bold; font-size: 0.85rem; }
+        h1 { text-align: center; font-size: 1.5rem; margin-bottom: 10px; }
+        label { display: block; margin-top: 10px; font-weight: bold; font-size: 0.9rem; }
         .req { color: red; }
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 1rem; }
         .flex-row { display: flex; gap: 8px; align-items: center; }
-        .flex-row div { flex: 1; }
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-size: 1.1rem; font-weight: bold; cursor: pointer; margin-top: 10px; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 8px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1rem; }
         .btn-confirm { background: var(--dark-bg); color: white; }
         
-        #inputPage, #confirmPage, #imageResultPage { display: none; }
-        #confirmPage { padding-bottom: 80px; }
-        #captureArea { background: white; padding: 15px; width: 360px; margin: 0 auto; border: 1px solid #eee; }
-        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; table-layout: fixed; }
-        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 4px 2px; text-align: center; font-size: 0.8rem; }
+        #authPage, #inputPage, #confirmPage, #imageResultPage { display: none; }
+        #captureArea { background: white; padding: 15px; width: 360px; margin: 0 auto; border: 1px solid #ccc; }
+        #captureArea table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        #captureArea th, #captureArea td { border: 1px solid #ccc; padding: 4px; text-align: center; font-size: 0.8rem; }
         #captureArea th { background: #eee; }
         .fixed-bottom-btns { position: fixed; bottom: 0; left: 0; width: 100%; background: white; padding: 10px; border-top: 1px solid #ddd; display: flex; gap: 10px; z-index: 100; }
+        .red-box { border: 2px solid var(--main-red); padding: 10px; border-radius: 8px; margin-top: 15px; font-size: 0.85rem; }
     </style>
 </head>
 <body>
 
-<div id="inputPage" class="container" style="display:block;">
+<div id="authPage" class="container" style="display:block;">
+    <h1>確認</h1>
+    <p style="font-size:0.9rem;">教会の許可なく帰参届を提出することはできません。</p>
+    <div style="background:#fff5f5; padding:15px; border-radius:8px; margin:20px 0;">
+        <input type="checkbox" id="authCheck" onclick="document.getElementById('startBtn').disabled=!this.checked">
+        <label style="display:inline;" for="authCheck">教会長である、または帰参届提出の承諾を得ている</label>
+    </div>
+    <button id="startBtn" class="btn btn-confirm" disabled onclick="document.getElementById('authPage').style.display='none'; document.getElementById('inputPage').style.display='block';">作成する</button>
+</div>
+
+<div id="inputPage" class="container">
     <h1>帰参届 入力</h1>
     <label>教会名<span class="req">*</span></label><input type="text" id="church">
     <label>帰参者名(代表)<span class="req">*</span></label><input type="text" id="repName">
@@ -42,25 +51,33 @@
     <label>到着日時</label><div class="flex-row"><input type="date" id="arrDate" onchange="generateMealTable()"><input type="time" id="arrTime"></div>
     <label>出発日時</label><div class="flex-row"><input type="date" id="depDate" onchange="generateMealTable()"><input type="time" id="depTime"></div>
     <label>交通手段</label>
-    <select id="transportMain">
-        <option value="鉄道">鉄道</option>
-        <option value="バス">バス</option>
-        <option value="飛行機">飛行機</option>
-        <option value="自教会">自教会</option>
-        <option value="同乗">同乗</option>
+    <select id="transportMain" onchange="toggleTransport()">
+        <option value="鉄道">鉄道</option><option value="バス">バス</option><option value="飛行機">飛行機</option><option value="自教会">自教会</option><option value="同乗">同乗</option>
     </select>
+    <select id="transportSub" class="hidden" onchange="toggleCarNum()" style="margin-top:10px;"></select>
+    <input type="text" id="transportExtra" class="hidden" placeholder="教会名を入力">
+    <input type="number" id="carNum" class="hidden" placeholder="台数">
+    
     <h2>食事・宿泊</h2>
     <div id="dateList"></div>
-    <label>備考</label><textarea id="memo" rows="3"></textarea>
+    
+    <div class="red-box">
+        <strong>直属食券申込</strong><br>
+        <input type="date" id="ticketDate"><input type="number" id="ticketCount" placeholder="食数">
+        <div style="color:red; margin-top:5px;">※直属食券が発行される日、申込〆切日をよくご確認ください。</div>
+    </div>
+    <label>備考</label>
+    <textarea id="memo" rows="3" placeholder="女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
     <button class="btn btn-confirm" onclick="showConfirm()">確認ページへ</button>
 </div>
 
 <div id="confirmPage">
     <div id="captureArea">
         <h2 style="text-align:center;">帰参届</h2>
-        <div id="summaryTable"></div>
+        <div id="summaryTable" style="font-size:0.85rem;"></div>
         <div id="mealDetailTable"></div>
-        <div id="memoArea" style="margin-top:10px;"></div>
+        <div id="ticketArea" style="margin-top:10px; color:red; font-weight:bold;"></div>
+        <div id="memoArea" style="margin-top:10px; font-size:0.8rem;"></div>
     </div>
     <div class="fixed-bottom-btns">
         <button class="btn" onclick="document.getElementById('confirmPage').style.display='none'; document.getElementById('inputPage').style.display='block';" style="background:#ccc;">修正</button>
@@ -68,17 +85,33 @@
     </div>
 </div>
 
-<div id="imageResultPage">
-    <h1 style="text-align:center;">完成</h1>
-    <div id="imageDisplay" style="text-align:center;"></div>
+<div id="imageResultPage" class="container">
+    <h1>送信用画像 完成</h1>
+    <div style="font-size:0.85rem; background:#f0f4f8; padding:10px; border-radius:8px;">
+        <strong>【送信方法】</strong><br>
+        iPhone: 画像を長押しで「共有」<br>
+        Android: スクリーンショットを撮影して共有<br>
+        <span style="color:red; font-weight:bold;">宛先：chichibu133@gmail.com</span>
+    </div>
+    <div id="imageDisplay" style="text-align:center; margin-top:15px;"></div>
     <button class="btn" onclick="location.reload()">最初に戻る</button>
 </div>
 
 <script>
+    function toggleTransport() {
+        const m = document.getElementById('transportMain').value, s = document.getElementById('transportSub'), e = document.getElementById('transportExtra'), c = document.getElementById('carNum');
+        s.classList.add('hidden'); e.classList.add('hidden'); c.classList.add('hidden');
+        if(m === 'バス') { s.classList.remove('hidden'); s.innerHTML = '<option>昼行</option><option>夜行</option>'; }
+        else if(m === '自教会') { s.classList.remove('hidden'); c.classList.remove('hidden'); s.innerHTML = '<option>観光バス</option><option>マイクロバス</option><option>自家用車</option>'; }
+        else if(m === '同乗') { s.classList.remove('hidden'); e.classList.remove('hidden'); s.innerHTML = '<option>大教会号</option><option>他教会</option>'; }
+    }
+    function toggleCarNum() {
+        const m = document.getElementById('transportMain').value, s = document.getElementById('transportSub').value;
+        document.getElementById('carNum').style.display = (m === '自教会') ? 'block' : 'none';
+        document.getElementById('transportExtra').style.display = (m === '同乗' && s === '他教会') ? 'block' : 'none';
+    }
     function generateMealTable() {
-        const s = document.getElementById('arrDate').value;
-        const e = document.getElementById('depDate').value;
-        const child = Number(document.getElementById('pChild').value || 0) > 0;
+        const s = document.getElementById('arrDate').value, e = document.getElementById('depDate').value, child = Number(document.getElementById('pChild').value || 0) > 0;
         if (!s || !e) return;
         let html = '<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>' + (child ? '<th>泊(子)</th>' : '') + '</tr>';
         let curr = new Date(s), end = new Date(e);
@@ -89,28 +122,21 @@
         document.getElementById('dateList').innerHTML = html + '</table>';
     }
     function showConfirm() {
-        document.getElementById('summaryTable').innerHTML = `教会:${document.getElementById('church').value}<br>代表:${document.getElementById('repName').value}<br>交通:${document.getElementById('transportMain').value}`;
-        let mRows = ""; 
-        document.querySelectorAll('#dateList tr').forEach((tr, i) => { 
-            if(i>0) {
-                mRows += "<tr>";
-                tr.querySelectorAll('td').forEach((td, idx) => {
-                    if(idx === 0) mRows += `<td>${td.innerText}</td>`;
-                    else {
-                        let val = td.querySelector('input').value;
-                        mRows += `<td>${val == 0 || val == "" ? "" : val}</td>`;
-                    }
-                });
-                mRows += "</tr>";
-            }
+        const a = document.getElementById('pAdult').value || 0, c = document.getElementById('pChild').value || 0;
+        document.getElementById('summaryTable').innerHTML = `教会:${document.getElementById('church').value}<br>代表:${document.getElementById('repName').value}<br>連絡:${document.getElementById('tel').value}<br>人数:大人${a}名/子供${c}名<br>到着:${document.getElementById('arrDate').value} ${document.getElementById('arrTime').value}<br>出発:${document.getElementById('depDate').value} ${document.getElementById('depTime').value}<br>交通:${document.getElementById('transportMain').value}`;
+        
+        let mRows = ""; document.querySelectorAll('#dateList tr').forEach((tr, i) => { 
+            if(i>0) { mRows += "<tr>"; tr.querySelectorAll('td').forEach((td, idx) => { if(idx === 0) mRows += `<td>${td.innerText}</td>`; else { let val = td.querySelector('input').value; mRows += `<td>${val == 0 || val == "" ? "" : val}</td>`; } }); mRows += "</tr>"; }
         });
         document.getElementById('mealDetailTable').innerHTML = `<table>${document.querySelector('#dateList table tr').outerHTML}${mRows}</table>`;
+        document.getElementById('ticketArea').innerHTML = document.getElementById('ticketCount').value ? `食券:${document.getElementById('ticketDate').value} ${document.getElementById('ticketCount').value}枚` : "";
         document.getElementById('memoArea').innerHTML = `<strong>備考:</strong> ${document.getElementById('memo').value}`;
         document.getElementById('inputPage').style.display = 'none'; document.getElementById('confirmPage').style.display = 'block';
     }
     async function makeScreenshot() {
         const canvas = await html2canvas(document.getElementById('captureArea'), { scale: 3 });
-        document.body.innerHTML = `<div style="text-align:center;"><h1>画像完成</h1><img src="${canvas.toDataURL("image/png")}" style="width:100%; max-width:360px;"><br><button class="btn" onclick="location.reload()">最初に戻る</button></div>`;
+        document.getElementById('confirmPage').style.display = 'none'; document.getElementById('imageResultPage').style.display = 'block';
+        document.getElementById('imageDisplay').innerHTML = `<img src="${canvas.toDataURL("image/png")}" style="width:100%; max-width:360px;">`;
     }
 </script>
 </body>
