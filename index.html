@@ -6,38 +6,62 @@
     <title>帰参届</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body { font-family: sans-serif; padding: 10px; }
-        .container { max-width: 400px; margin: auto; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; border: 1px solid #ccc; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; margin-top: 10px; border: none; background: #333; color: white; font-weight: bold; }
-        #captureArea { width: 360px; background: white; padding: 20px; border: 1px solid #000; }
+        body { font-family: sans-serif; padding: 20px; font-size: 1.2rem; }
+        .container { max-width: 500px; margin: auto; }
+        input, select, textarea { width: 100%; padding: 15px; margin: 8px 0; border: 2px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 1.2rem; }
+        .btn { width: 100%; padding: 20px; margin-top: 15px; border: none; background: #333; color: white; font-weight: bold; font-size: 1.3rem; }
+        #captureArea { width: 380px; background: white; padding: 20px; border: 1px solid #000; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #000; padding: 5px; text-align: center; }
+        th, td { border: 1px solid #000; padding: 10px; text-align: center; }
         .hidden { display: none; }
     </style>
 </head>
 <body>
 
-<div id="inputPage" class="container">
+<div id="authPage" class="container">
+    <h1 style="color:red;">※教会の許可なく帰参届を提出することはできません。</h1>
+    <input type="checkbox" id="authCheck" onclick="document.getElementById('startBtn').disabled=!this.checked">
+    <label for="authCheck">私は、教会長です。または帰参届提出の承諾を得ています。</label>
+    <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').style.display='none'; document.getElementById('inputPage').style.display='block';">作成する</button>
+</div>
+
+<div id="inputPage" class="container hidden">
     <h2>帰参届入力</h2>
     <label>教会名</label><input type="text" id="church">
     <label>帰参者名(代表)</label><input type="text" id="repName">
     <label>連絡先</label><input type="tel" id="tel">
-    <label>人数 (大/子/乳)</label>
+    <label>人数</label>
     <div style="display:flex; gap:5px;">
-        <input type="number" id="pA" placeholder="大"><input type="number" id="pC" placeholder="子" oninput="genTable()">
-        <input type="number" id="pB" placeholder="乳">
+        <input type="number" id="pA" placeholder="大人">
+        <input type="number" id="pC" placeholder="子供" oninput="genTable()">
+        <input type="number" id="pB" placeholder="乳児">
     </div>
-    <label>詰所到着日時</label><input type="date" id="arrD"><input type="time" id="arrT">
-    <label>詰所出発日時</label><input type="date" id="depD"><input type="time" id="depT">
+    <label>詰所到着日時</label>
+    <div style="display:flex; gap:5px;"><input type="date" id="arrD" onchange="genTable()"><input type="time" id="arrT"></div>
+    <label>詰所出発日時</label>
+    <div style="display:flex; gap:5px;"><input type="date" id="depD" onchange="genTable()"><input type="time" id="depT"></div>
+    
     <label>交通手段</label>
     <select id="trans" onchange="toggleT()">
-        <option value="">選択して下さい</option><option value="バス">バス</option>
-        <option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option>
+        <option value="">選択して下さい</option>
+        <option value="鉄道">鉄道</option>
+        <option value="バス">バス</option>
+        <option value="自教会">自教会</option>
+        <option value="同乗">同乗</option>
+        <option value="他">他</option>
     </select>
     <div id="subT" class="hidden"></div>
+    
+    <h3>食事・宿泊明細</h3>
     <div id="dateList"></div>
-    <label>備考</label><textarea id="memo" rows="3">※女性部屋希望、別席・願書等ある方もこちらにご記入下さい。</textarea>
+    
+    <div style="border:1px solid #ccc; padding:10px;">
+        <label>直属食券</label>
+        <div style="display:flex; gap:5px;"><input type="date" id="tDate"><input type="number" id="tCount" placeholder="食数"></div>
+    </div>
+    
+    <label>備考</label>
+    <textarea id="memo" rows="3" placeholder="※女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
     <button class="btn" onclick="showConfirm()">確認ページへ</button>
 </div>
 
@@ -45,10 +69,10 @@
     <h2>確認ページ</h2>
     <div id="captureArea">
         <h2 style="text-align:center;">帰参届</h2>
-        <div id="resSum" style="font-size:1.2rem;"></div>
-        <h3 style="border-bottom:2px solid #000;">食事・宿泊明細</h3>
+        <div id="resSum" style="font-size:1.3rem;"></div>
+        <h3>食事・宿泊明細</h3>
         <div id="resTable"></div>
-        <div id="resMemo" style="margin-top:10px;"></div>
+        <div id="resMemo" style="margin-top:10px; font-size:1.1rem;"></div>
     </div>
     <button class="btn" style="background:#888;" onclick="backEdit()">修正</button>
     <button class="btn" onclick="snap()">画像作成</button>
@@ -61,8 +85,8 @@
         sub.innerHTML = ""; sub.classList.remove('hidden');
         if(v==='バス') sub.innerHTML='<select><option>昼行</option><option>夜行</option></select>';
         else if(v==='自教会') sub.innerHTML='<select><option>自家用車</option><option>マイクロバス</option><option>観光バス</option></select><input type="number" placeholder="台数">';
-        else if(v==='同乗') sub.innerHTML='<select><option>大教会号</option><option>他教会</option></select>';
-        else if(v==='他') sub.innerHTML='<input type="text" placeholder="入力して下さい">';
+        else if(v==='同乗') sub.innerHTML='<select><option>大教会号</option><option>他教会</option></select><input type="text" id="otherChurch" placeholder="他教会名">';
+        else if(v==='他') sub.innerHTML='<input type="text" placeholder="交通手段を入力">';
         else sub.classList.add('hidden');
     }
     function genTable(){
@@ -77,9 +101,9 @@
         document.getElementById('dateList').innerHTML = html + '</table>';
     }
     function showConfirm(){
-        document.getElementById('resSum').innerHTML = `教会名: ${document.getElementById('church').value}<br>代表: ${document.getElementById('repName').value}<br>交通: ${document.getElementById('trans').value}`;
+        document.getElementById('resSum').innerHTML = `教会名: ${document.getElementById('church').value}<br>代表: ${document.getElementById('repName').value}<br>連絡: ${document.getElementById('tel').value}<br>人数: 大${document.getElementById('pA').value}・子${document.getElementById('pC').value}・乳${document.getElementById('pB').value}<br>交通: ${document.getElementById('trans').value}`;
         document.getElementById('resTable').innerHTML = document.getElementById('dateList').innerHTML;
-        document.getElementById('resMemo').innerHTML = document.getElementById('memo').value;
+        document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${document.getElementById('memo').value}<br><br><strong>直属食券:</strong> ${document.getElementById('tDate').value} ${document.getElementById('tCount').value}枚`;
         document.getElementById('inputPage').classList.add('hidden');
         document.getElementById('confirmPage').classList.remove('hidden');
     }
