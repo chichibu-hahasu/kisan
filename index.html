@@ -7,12 +7,16 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         body { font-family: sans-serif; background: #f9f9f9; padding: 10px; color: #222; }
-        .container { max-width: 400px; margin: auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .container { max-width: 400px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
         h1, h2 { text-align: center; margin-top: 0; }
         label { display: block; margin-top: 15px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1.1rem; background: #333; color: #fff; }
         
+        /* 認証画面の中央寄せ用 */
+        #authPage { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; border: none; box-shadow: none; background: transparent; }
+        .auth-inner { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; text-align: center; }
+
         #captureArea { background: white; padding: 15px; width: 340px; border: 1px solid #000; margin: auto; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; }
         th, td { border: 1px solid #000; padding: 4px; text-align: center; }
@@ -23,11 +27,13 @@
 <body>
 
 <div id="authPage" class="container">
-    <h1>確認</h1>
-    <p style="color:#d32f2f; font-size:0.9rem; font-weight:bold;">※教会の許可なく帰参届を提出することはできません。</p>
-    <input type="checkbox" id="authCheck" onclick="document.getElementById('startBtn').disabled=!this.checked">
-    <label style="display:inline;" for="authCheck">私は、教会長です。または帰参届提出の承諾を得ています。</label>
-    <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').classList.add('hidden'); document.getElementById('inputPage').classList.remove('hidden');">作成する</button>
+    <div class="auth-inner">
+        <h1 style="color:#d32f2f; font-size:1.2rem;">※教会の許可なく帰参届を提出することはできません。</h1>
+        <p style="font-weight:bold; margin-top:20px;">私は、教会長です。または帰参届提出の承諾を得ています。</p>
+        <input type="checkbox" id="authCheck" style="width:auto; transform:scale(1.5); margin:15px;" onclick="document.getElementById('startBtn').disabled=!this.checked">
+        <p style="margin:0; color:#666;">チェックして下さい</p>
+        <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').classList.add('hidden'); document.getElementById('inputPage').classList.remove('hidden');">作成する</button>
+    </div>
 </div>
 
 <div id="inputPage" class="container hidden">
