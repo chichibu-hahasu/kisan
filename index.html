@@ -43,15 +43,17 @@
     
     <label><span style="color:red;">*</span>詰所到着予定日時</label>
     <div class="date-time-group">
-        <input type="date" id="arrD" onchange="genTable()" placeholder="日付">
-        <input type="time" id="arrT" placeholder="時刻">
+        <input type="date" id="arrD" onchange="genTable()">
+        <input type="time" id="arrT">
     </div>
+    <p style="font-size:0.75rem; color:#888; margin-top:5px;">※左側に日付、右側に時刻を選択してください</p>
     
     <label><span style="color:red;">*</span>詰所出発予定日時</label>
     <div class="date-time-group">
-        <input type="date" id="depD" onchange="genTable()" placeholder="日付">
-        <input type="time" id="depT" placeholder="時刻">
+        <input type="date" id="depD" onchange="genTable()">
+        <input type="time" id="depT">
     </div>
+    <p style="font-size:0.75rem; color:#888; margin-top:5px;">※左側に日付、右側に時刻を選択してください</p>
     
     <label><span style="color:red;">*</span>交通手段</label>
     <select id="trans" onchange="toggleT()"><option value="">選択して下さい</option><option value="鉄道">鉄道</option><option value="バス">バス</option><option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option></select>
@@ -65,7 +67,27 @@
 </div>
 
 <script>
-    // 既存の関数を維持
+    function toggleT(){
+        const v = document.getElementById('trans').value, sub = document.getElementById('subT');
+        sub.innerHTML = ""; sub.classList.remove('hidden');
+        if(v==='バス') sub.innerHTML='<select><option>昼行</option><option>夜行</option></select>';
+        else if(v==='自教会') sub.innerHTML='<select><option>自家用車</option><option>マイクロバス</option><option>観光バス</option></select><input type="number" placeholder="台数">';
+        else if(v==='同乗') sub.innerHTML='<select id="dSet" onchange="checkOther()"><option>大教会号</option><option>他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="他教会名">';
+        else if(v==='他') sub.innerHTML='<input type="text" placeholder="交通手段">';
+        else sub.classList.add('hidden');
+    }
+    function checkOther(){ document.getElementById('otherChurch').className = document.getElementById('dSet').value==='他教会'?'':'hidden'; }
+    function genTable(){
+        const s = document.getElementById('arrD').value, e = document.getElementById('depD').value;
+        if(!s||!e) return;
+        let html = '<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊</th>'+(document.getElementById('pC').value>0?'<th>泊(子)</th>':'')+'</tr>';
+        let d = new Date(s), end = new Date(e);
+        while(d<=end){
+            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td><td><input type="number" style="width:30px"></td>`+(document.getElementById('pC').value>0?'<td><input type="number" style="width:30px"></td>':'')+'</tr>';
+            d.setDate(d.getDate()+1);
+        }
+        document.getElementById('dateList').innerHTML = html+'</table>';
+    }
 </script>
 </body>
 </html>
