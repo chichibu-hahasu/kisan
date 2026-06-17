@@ -34,7 +34,7 @@
         <h1 style="font-size:1.2rem;">※教会の許可なく帰参届を提出することはできません。</h1>
         <p style="font-weight:bold; margin-top:20px;">私は、教会長です。または帰参届提出の承諾を得ています。</p>
         <input type="checkbox" id="authCheck" style="width:auto; transform:scale(1.5); margin:15px;" onclick="document.getElementById('startBtn').disabled=!this.checked">
-        <p style="margin:0; color:#666;">チェックして下さい</p>
+        <p style="margin:0; color:#666;">「はい」の場合チェックして下さい</p>
         <button id="startBtn" class="btn" disabled onclick="document.getElementById('authPage').classList.add('hidden'); document.getElementById('inputPage').classList.remove('hidden');">作成する</button>
     </div>
 </div>
@@ -69,8 +69,11 @@
     <label><span style="color:red;">*</span>交通手段</label>
     <select id="trans" onchange="toggleT()">
         <option value="">選択して下さい</option>
-        <option value="鉄道">鉄道</option><option value="バス">バス</option>
-        <option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option>
+        <option value="鉄道">鉄道</option>
+        <option value="バス">バス</option>
+        <option value="自教会">自教会</option>
+        <option value="同乗">同乗</option>
+        <option value="他">他</option>
     </select>
     <div id="subT" style="margin-top:10px;"></div>
     
