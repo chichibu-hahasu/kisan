@@ -11,7 +11,8 @@
         h1 { text-align: center; color: #d32f2f; }
         .page-title { text-align: center; font-size: 1.8rem; margin: 10px 0; }
         label { display: block; margin-top: 15px; font-weight: bold; }
-        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+        /* 入力欄のスタイルを明示的に定義 */
+        input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; box-sizing: border-box; }
         .date-time-group { display: flex; gap: 5px; }
         .date-time-group input { flex: 1; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1.1rem; background: #333; color: #fff; }
@@ -24,7 +25,8 @@
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.75rem; table-layout: fixed; }
         th, td { border: 1px solid #000; padding: 2px; text-align: center; }
         th { background: #eee; }
-        input[type="number"] { padding: 5px 0; text-align: center; border: none; background: transparent; }
+        /* テーブル内の数字入力欄 */
+        input[type="number"].table-input { padding: 5px 0; text-align: center; border: 1px solid #ddd; background: #fff; width: 30px; }
     </style>
 </head>
 <body>
@@ -46,8 +48,13 @@
     <label><span style="color:red;">*</span>教会名</label><input type="text" id="church">
     <label><span style="color:red;">*</span>帰参者名(代表)</label><input type="text" id="repName">
     <label><span style="color:red;">*</span>連絡先</label><input type="tel" id="tel">
+    
     <label><span style="color:red;">*</span>人数</label>
-    <div style="display:flex; gap:5px;"><input type="number" id="pA" placeholder="大人"><input type="number" id="pC" placeholder="子供" oninput="genTable()"><input type="number" id="pB" placeholder="乳児"></div>
+    <div style="display:flex; gap:5px;">
+        <input type="number" id="pA" placeholder="大人" oninput="genTable()">
+        <input type="number" id="pC" placeholder="子供" oninput="genTable()">
+        <input type="number" id="pB" placeholder="乳児">
+    </div>
     
     <label><span style="color:red;">*</span>詰所到着予定日時</label>
     <div class="date-time-group"><input type="date" id="arrD" onchange="genTable()"><input type="time" id="arrT"></div>
@@ -68,7 +75,10 @@
     <h3>食事・宿泊明細</h3>
     <div id="dateList"></div>
     <label>直属食券</label>
-    <div style="display:flex; gap:5px;"><input type="date" id="tDate"><input type="number" id="tCount" placeholder="食数"></div>
+    <div style="display:flex; gap:5px;">
+        <input type="date" id="tDate">
+        <input type="number" id="tCount" placeholder="食数">
+    </div>
     <p style="color:red; font-size:1rem; font-weight:bold; margin-top:10px;">※直属食券が発行される日、申込〆切日をよくご確認ください。</p>
     <label>備考</label><textarea id="memo" rows="3" placeholder="※女性部屋希望、別席・願書等ある方もこちらにご記入下さい。"></textarea>
     <button class="btn" onclick="validateAndConfirm()">確認ページへ</button>
@@ -111,7 +121,7 @@
         let html = `<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>`+(hasChild?'<th>泊(子)</th>':'')+'</tr>';
         let d = new Date(s), end = new Date(e);
         while(d<=end){
-            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" pattern="\\d*"></td><td><input type="number" pattern="\\d*"></td><td><input type="number" pattern="\\d*"></td><td><input type="number" pattern="\\d*"></td>`+(hasChild?'<td><input type="number" pattern="\\d*"></td>':'')+'</tr>';
+            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td>`+(hasChild?'<td><input type="number" class="table-input" pattern="\\d*"></td>':'')+'</tr>';
             d.setDate(d.getDate()+1);
         }
         document.getElementById('dateList').innerHTML = html+'</table>';
