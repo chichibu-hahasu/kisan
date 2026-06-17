@@ -20,11 +20,12 @@
         .auth-inner { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
         .hidden { display: none !important; }
         
-        #captureArea { background: white; padding: 15px; width: 340px; border: 1px solid #000; margin: auto; }
-        table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.75rem; table-layout: fixed; }
-        th, td { border: 1px solid #000; padding: 2px; text-align: center; }
+        #captureArea { background: white; padding: 10px; width: 320px; border: 1px solid #000; margin: auto; font-size: 0.8rem; }
+        table { width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 0.7rem; table-layout: fixed; }
+        th, td { border: 1px solid #000; padding: 1px; text-align: center; }
         th { background: #eee; }
-        input[type="number"].table-input { padding: 5px 0; text-align: center; border: 1px solid #ddd; background: #fff; width: 30px; }
+        /* 入力欄のサイズを縮小 */
+        .table-input { width: 25px !important; padding: 2px !important; font-size: 0.7rem; border: none; text-align: center; }
     </style>
 </head>
 <body>
@@ -93,11 +94,11 @@
 <div id="confirmPage" class="container hidden">
     <h2>確認ページ</h2>
     <div id="captureArea">
-        <h2 style="margin:0;">帰参届</h2>
-        <div id="resSum" style="font-size:0.9rem; line-height:1.4;"></div>
-        <h3 style="margin:10px 0 0 0;">食事・宿泊明細</h3>
+        <h2 style="margin:0; text-align:center;">帰参届</h2>
+        <div id="resSum" style="line-height:1.3;"></div>
+        <h3 style="margin:5px 0 0 0;">食事・宿泊明細</h3>
         <div id="resTable"></div>
-        <div id="resMemo" style="font-size:0.8rem;"></div>
+        <div id="resMemo" style="margin-top:5px;"></div>
     </div>
     <button class="btn" style="background:#888;" onclick="backEdit()">修正</button>
     <button class="btn" onclick="snap()">画像作成</button>
@@ -135,9 +136,19 @@
     function validateAndConfirm(){
         const req = ['church','repName','tel','arrD','depD','trans'];
         for(let id of req){ if(!document.getElementById(id).value){ alert('※の付いた必須項目をすべて入力してください。'); return; } }
+        
         const vals = {}; document.querySelectorAll('input, select, textarea').forEach(i => vals[i.id] = i.value);
         document.getElementById('resSum').innerHTML = `教会名: ${vals.church}<br>代表: ${vals.repName}<br>連絡: ${vals.tel}<br>人数: 大${vals.pA}・子${vals.pC}・乳${vals.pB}<br>男女: 男${vals.genderM}名 女${vals.genderF}名<br>到着: ${vals.arrD} ${vals.arrT}<br>出発: ${vals.depD} ${vals.depT}<br>交通: ${vals.trans}`;
-        document.getElementById('resTable').innerHTML = document.getElementById('dateList').innerHTML;
+        
+        // 表を複製（入力値もそのまま表示）
+        const originalTable = document.getElementById('dateList').innerHTML;
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(originalTable, 'text/html');
+        const inputs = doc.querySelectorAll('input');
+        const userInputs = document.querySelectorAll('#dateList input');
+        inputs.forEach((input, index) => input.value = userInputs[index].value);
+        document.getElementById('resTable').innerHTML = doc.body.innerHTML;
+        
         document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${vals.memo}<br><strong>直属食券:</strong> ${vals.tDate} ${vals.tCount}枚`;
         document.getElementById('inputPage').classList.add('hidden');
         document.getElementById('confirmPage').classList.remove('hidden');
