@@ -11,12 +11,13 @@
         h1, h2 { text-align: center; margin-top: 0; }
         label { display: block; margin-top: 15px; font-weight: bold; }
         input, select, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #ccc; border-radius: 5px; font-size: 1rem; }
+        /* 日付・時刻を横並びにするためのスタイル */
+        .date-time-group { display: flex; gap: 5px; }
+        .date-time-group input { flex: 1; }
         .btn { width: 100%; padding: 15px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; margin-top: 15px; font-size: 1.1rem; background: #333; color: #fff; }
         
-        /* 認証画面の中央寄せ用 */
         #authPage { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; border: none; box-shadow: none; background: transparent; }
         .auth-inner { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; text-align: center; }
-
         #captureArea { background: white; padding: 15px; width: 340px; border: 1px solid #000; margin: auto; }
         table { width: 100%; border-collapse: collapse; margin: 10px 0; font-size: 0.8rem; }
         th, td { border: 1px solid #000; padding: 4px; text-align: center; }
@@ -44,8 +45,13 @@
     <label><span style="color:red;">*</span>連絡先</label><input type="tel" id="tel">
     <label><span style="color:red;">*</span>人数</label>
     <div style="display:flex; gap:5px;"><input type="number" id="pA" placeholder="大人"><input type="number" id="pC" placeholder="子供" oninput="genTable()"><input type="number" id="pB" placeholder="乳児"></div>
-    <label><span style="color:red;">*</span>詰所到着日時</label><input type="date" id="arrD" onchange="genTable()"><input type="time" id="arrT">
-    <label><span style="color:red;">*</span>詰所出発日時</label><input type="date" id="depD" onchange="genTable()"><input type="time" id="depT">
+    
+    <label><span style="color:red;">*</span>詰所到着予定日時</label>
+    <div class="date-time-group"><input type="date" id="arrD" onchange="genTable()" placeholder="日付"><input type="time" id="arrT" placeholder="時刻"></div>
+    
+    <label><span style="color:red;">*</span>詰所出発予定日時</label>
+    <div class="date-time-group"><input type="date" id="depD" onchange="genTable()" placeholder="日付"><input type="time" id="depT" placeholder="時刻"></div>
+    
     <label><span style="color:red;">*</span>交通手段</label>
     <select id="trans" onchange="toggleT()"><option value="">選択して下さい</option><option value="鉄道">鉄道</option><option value="バス">バス</option><option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option></select>
     <div id="subT" class="hidden"></div>
