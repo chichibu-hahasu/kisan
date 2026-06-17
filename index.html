@@ -17,7 +17,6 @@
         #authPage { display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 80vh; }
         .auth-inner { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
         .hidden { display: none !important; }
-        .error { color: red; font-weight: bold; text-align: center; margin: 10px 0; }
     </style>
 </head>
 <body>
@@ -34,8 +33,6 @@
 
 <div id="inputPage" class="container hidden">
     <h2>帰参届入力</h2>
-    <p style="color:red; font-size:0.8rem;">※は必須項目です。</p>
-    <div id="errorMsg" class="error"></div>
     <label><span style="color:red;">*</span>教会名</label><input type="text" id="church">
     <label><span style="color:red;">*</span>帰参者名(代表)</label><input type="text" id="repName">
     <label><span style="color:red;">*</span>連絡先</label><input type="tel" id="tel">
@@ -51,8 +48,13 @@
     <p style="font-size:0.75rem; color:#888; margin-top:5px;">※左側に日付、右側に時刻を選択してください</p>
     
     <label><span style="color:red;">*</span>交通手段</label>
-    <select id="trans" onchange="toggleT()"><option value="">選択して下さい</option><option value="鉄道">鉄道</option><option value="バス">バス</option><option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option></select>
-    <div id="subT" class="hidden"></div>
+    <select id="trans" onchange="toggleT()">
+        <option value="">選択して下さい</option>
+        <option value="鉄道">鉄道</option><option value="バス">バス</option>
+        <option value="自教会">自教会</option><option value="同乗">同乗</option><option value="他">他</option>
+    </select>
+    <div id="subT" style="margin-top:10px;"></div>
+    
     <h3>食事・宿泊明細</h3>
     <div id="dateList"></div>
     <label>直属食券</label>
@@ -63,7 +65,15 @@
 </div>
 
 <script>
-    function toggleT(){ /* 既存ロジック維持 */ }
+    function toggleT(){
+        const v = document.getElementById('trans').value, sub = document.getElementById('subT');
+        sub.innerHTML = "";
+        if(v==='バス') sub.innerHTML='<select><option>昼行</option><option>夜行</option></select>';
+        else if(v==='自教会') sub.innerHTML='<select><option>自家用車</option><option>マイクロバス</option><option>観光バス</option></select><input type="number" placeholder="台数">';
+        else if(v==='同乗') sub.innerHTML='<select id="dSet" onchange="checkOther()"><option>大教会号</option><option>他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="他教会名">';
+        else if(v==='他') sub.innerHTML='<input type="text" placeholder="交通手段">';
+    }
+    function checkOther(){ document.getElementById('otherChurch').classList.toggle('hidden', document.getElementById('dSet').value !== '他教会'); }
     function genTable(){
         const s = document.getElementById('arrD').value, e = document.getElementById('depD').value;
         if(!s||!e) return;
@@ -77,9 +87,10 @@
     }
     function validateAndConfirm(){
         const req = ['church','repName','tel','arrD','depD','trans'];
-        for(let id of req){ if(!document.getElementById(id).value){ document.getElementById('errorMsg').innerText='※は必須項目です。'; return; } }
-        document.getElementById('errorMsg').innerText='';
-        showConfirm(); // 既存の確認ページ表示ロジックへ
+        for(let id of req){ if(!document.getElementById(id).value){ alert('※は必須項目です。'); return; } }
+        // 既存の showConfirm() を呼び出す処理へ
+        alert('確認ページへ進みます'); 
+        showConfirm(); 
     }
 </script>
 </body>
