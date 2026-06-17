@@ -22,10 +22,11 @@
         
         #captureArea { background: white; padding: 10px; width: 320px; border: 1px solid #000; margin: auto; font-size: 0.8rem; }
         table { width: 100%; border-collapse: collapse; margin: 5px 0; font-size: 0.7rem; table-layout: fixed; }
-        th, td { border: 1px solid #000; padding: 1px; text-align: center; }
+        th, td { border: 1px solid #000; padding: 2px; text-align: center; }
         th { background: #eee; }
-        /* 入力欄のサイズを縮小 */
-        .table-input { width: 25px !important; padding: 2px !important; font-size: 0.7rem; border: none; text-align: center; }
+        
+        /* 拡大防止のため、フォントサイズを16pxにする */
+        .table-input { width: 25px !important; padding: 2px !important; font-size: 16px !important; border: none; text-align: center; background: transparent; }
     </style>
 </head>
 <body>
@@ -128,7 +129,7 @@
         let html = `<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>`+(hasChild?'<th>泊(子)</th>':'')+'</tr>';
         let d = new Date(s), end = new Date(e);
         while(d<=end){
-            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td>`+(hasChild?'<td><input type="number" class="table-input" pattern="\\d*"></td>':'')+'</tr>';
+            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" class="table-input" value="0"></td><td><input type="number" class="table-input" value="0"></td><td><input type="number" class="table-input" value="0"></td><td><input type="number" class="table-input" value="0"></td>`+(hasChild?'<td><input type="number" class="table-input" value="0"></td>':'')+'</tr>';
             d.setDate(d.getDate()+1);
         }
         document.getElementById('dateList').innerHTML = html+'</table>';
@@ -140,14 +141,14 @@
         const vals = {}; document.querySelectorAll('input, select, textarea').forEach(i => vals[i.id] = i.value);
         document.getElementById('resSum').innerHTML = `教会名: ${vals.church}<br>代表: ${vals.repName}<br>連絡: ${vals.tel}<br>人数: 大${vals.pA}・子${vals.pC}・乳${vals.pB}<br>男女: 男${vals.genderM}名 女${vals.genderF}名<br>到着: ${vals.arrD} ${vals.arrT}<br>出発: ${vals.depD} ${vals.depT}<br>交通: ${vals.trans}`;
         
-        // 表を複製（入力値もそのまま表示）
-        const originalTable = document.getElementById('dateList').innerHTML;
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(originalTable, 'text/html');
-        const inputs = doc.querySelectorAll('input');
-        const userInputs = document.querySelectorAll('#dateList input');
-        inputs.forEach((input, index) => input.value = userInputs[index].value);
-        document.getElementById('resTable').innerHTML = doc.body.innerHTML;
+        // 入力値を反映した表を作成
+        const tableHtml = document.getElementById('dateList').innerHTML;
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = tableHtml;
+        const originalInputs = document.querySelectorAll('#dateList input');
+        const newInputs = tempDiv.querySelectorAll('input');
+        newInputs.forEach((input, i) => input.value = originalInputs[i].value);
+        document.getElementById('resTable').innerHTML = tempDiv.innerHTML;
         
         document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${vals.memo}<br><strong>直属食券:</strong> ${vals.tDate} ${vals.tCount}枚`;
         document.getElementById('inputPage').classList.add('hidden');
