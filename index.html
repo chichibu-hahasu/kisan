@@ -496,8 +496,23 @@ ${v.trans}
 
 `;
 
+const tableClone =
+document.getElementById('dateList').cloneNode(true);
+
+tableClone
+.querySelectorAll('input')
+.forEach(input=>{
+
+const value=input.value || "0";
+
+const td=input.parentElement;
+
+td.innerHTML=value;
+
+});
+
 document.getElementById('resTable').innerHTML=
-document.getElementById('dateList').innerHTML;
+tableClone.innerHTML;
 
 document.getElementById('resMemo').innerHTML=`
 
