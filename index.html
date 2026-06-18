@@ -115,6 +115,7 @@
     margin-top: 10px;
     font-size: 1rem;
 }
+#cDetail { font-size: 0.85rem; white-space: nowrap; }
 
 /* ▼▼▼ 確認ページ専用 CSS（ここまで） ▼▼▼ */
 
@@ -201,7 +202,7 @@
                 <td id="cChurch" class="info-value"></td>
             </tr>
             <tr>
-                <th class="info-label">帰参者（代表）</th>
+                <th class="info-label">帰参者</th>
                 <td id="cRep" class="info-value"></td>
             </tr>
             <tr>
@@ -250,7 +251,7 @@
 </div>
 
 <script>
-   /* ▼▼▼ 確認ページ用 JavaScript（ここから） ▼▼▼ */
+  /* ▼▼▼ 確認ページ用 JavaScript（ここから） ▼▼▼ */
 
 /* 交通手段のサブ入力切り替え */
 function toggleT(){
@@ -261,7 +262,7 @@ function toggleT(){
     if(v==='バス') {
         sub.innerHTML='<select id="busType"><option value="昼行">昼行</option><option value="夜行">夜行</option></select>';
     } else if(v==='自教会') {
-        sub.innerHTML='<select id="carType"><option value="自家用車">自家用車</option><option value="マイクロバス">マイクロバス</option><option value="観光バス">観光バス</option></select><input type="number" id="carCount" placeholder="台数">';
+        sub.innerHTML='<select id="carType"><option value="自家用車">自家用車</option><option value="マイクロバス">マイクロバス</option><option value="観光バス">観光バス</option></select><input type="number" id="carCount" placeholder="台数" inputmode="numeric">';
     } else if(v==='同乗') {
         sub.innerHTML='<select id="dSet" onchange="checkOther()"><option value="大教会号">大教会号</option><option value="他教会">他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="他教会名">';
     } else if(v==='他') {
@@ -288,11 +289,11 @@ function genTable(){
     while(d <= end){
         html += `<tr>
             <td>${d.getMonth()+1}/${d.getDate()}</td>
-            <td><input type="number" class="table-input"></td>
-            <td><input type="number" class="table-input"></td>
-            <td><input type="number" class="table-input"></td>
-            <td><input type="number" class="table-input"></td>
-            ${hasChild?'<td><input type="number" class="table-input"></td>':''}
+            <td><input type="number" class="table-input" inputmode="numeric"></td>
+            <td><input type="number" class="table-input" inputmode="numeric"></td>
+            <td><input type="number" class="table-input" inputmode="numeric"></td>
+            <td><input type="number" class="table-input" inputmode="numeric"></td>
+            ${hasChild?'<td><input type="number" class="table-input" inputmode="numeric"></td>':''}
         </tr>`;
         d.setDate(d.getDate()+1);
     }
@@ -428,7 +429,7 @@ async function sendImage(){
                 await navigator.share({
                     files: [file],
                     title: '帰参届',
-                    text: '帰参届です。'
+                    text: '帰参届の画像です。'
                 });
 
                 askAfterShare();  // ← 共有後のポップアップ
@@ -469,6 +470,7 @@ function fallbackShow(canvas) {
 }
 
 /* ▼▼▼ 確認ページ用 JavaScript（ここまで） ▼▼▼ */
+
 
 </script>
 </body>
