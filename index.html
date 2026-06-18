@@ -428,7 +428,7 @@ async function sendImage(){
                 await navigator.share({
                     files: [file],
                     title: '帰参届',
-                    text: '帰参届の画像です。'
+                    text: '帰参届です。'
                 });
 
                 askAfterShare();  // ← 共有後のポップアップ
@@ -463,7 +463,7 @@ function fallbackShow(canvas) {
         `<img src="${canvas.toDataURL()}" style="width:100%">`;
 
     document.getElementById('method').innerHTML = `
-        画像を長押しして保存し、メールやLINEなどで送信してください。<br>
+        帰参届をスクショして保存し、メールやLINEなどで送信してください。<br>
         <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
     `;
 }
