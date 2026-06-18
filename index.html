@@ -153,13 +153,13 @@
     
     <label><span style="color:red;">*</span>人数</label>
     <div style="display:flex; gap:5px;">
-        <input type="number" id="pA" placeholder="大人" oninput="genTable()">
-        <input type="number" id="pC" placeholder="子供" oninput="genTable()">
-        <input type="number" id="pB" placeholder="乳児">
+        <input type="number" id="pA" placeholder="大人" oninput="genTable()" inputmode="numeric">
+<input type="number" id="pC" placeholder="子供" oninput="genTable()" inputmode="numeric">
+<input type="number" id="pB" placeholder="乳児" inputmode="numeric">
     </div>
     <div style="display:flex; gap:5px; margin-top:5px;">
-        <input type="number" id="genderM" placeholder="男(人数)">
-        <input type="number" id="genderF" placeholder="女(人数)">
+        <input type="number" id="genderM" placeholder="男(人数)" inputmode="numeric">
+<input type="number" id="genderF" placeholder="女(人数)" inputmode="numeric">
     </div>
     
     <label><span style="color:red;">*</span>詰所到着予定日時</label>
@@ -187,7 +187,7 @@
     <label>直属食券</label>
     <div style="display:flex; gap:5px;">
         <input type="date" id="tDate">
-        <input type="number" id="tCount" placeholder="食数">
+        <input type="number" id="tCount" placeholder="食数" inputmode="numeric">
     </div>
     <p style="color:red; font-size:1rem; font-weight:bold; margin-top:10px;">※直属食券が発行される日、申込〆切日をよくご確認ください。</p>
     <label>備考</label>
