@@ -31,6 +31,93 @@
         input[type="number"].table-input { padding: 5px 0; text-align: center; border: 1px solid #ddd; background: #fff; width: 30px; }
         #resMemo { margin-top: 6px; font-size: 0.75rem; }
         #resTicket { margin-top: 2px; font-size: 0.75rem; color: #d32f2f; }
+/* ▼▼▼ 確認ページ専用 CSS（ここから） ▼▼▼ */
+
+/* 全体のキャプチャ領域を少し細くする */
+#captureArea {
+    width: 300px;
+    margin: auto;
+    padding: 12px;
+    background: #fff;
+    border: 1px solid #000;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+/* 教会名〜交通手段の表 */
+#infoTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+#infoTable th,
+#infoTable td {
+    border: 1px solid #000;
+    padding: 6px;
+    vertical-align: top;
+}
+
+/* 左側の項目名セル（薄いグレー） */
+#infoTable th.info-label {
+    background: #e6e6e6;
+    width: 90px;
+    font-weight: bold;
+}
+
+/* 右側の値セル */
+#infoTable td.info-value {
+    background: #fff;
+}
+
+/* 食事・宿泊明細の表（横幅を細く） */
+#resTable table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+#resTable th,
+#resTable td {
+    border: 1px solid #000;
+    padding: 3px;
+    text-align: center;
+}
+
+/* 列幅を細くして3桁でも切れないように */
+#resTable th:nth-child(1),
+#resTable td:nth-child(1) {
+    width: 55px; /* 日付 */
+}
+#resTable th:nth-child(2),
+#resTable td:nth-child(2),
+#resTable th:nth-child(3),
+#resTable td:nth-child(3),
+#resTable th:nth-child(4),
+#resTable td:nth-child(4),
+#resTable th:nth-child(5),
+#resTable td:nth-child(5),
+#resTable th:nth-child(6),
+#resTable td:nth-child(6) {
+    width: 38px; /* 朝・昼・夕・泊(大)・泊(子) */
+}
+
+/* 直属食券（赤字） */
+#resTicket {
+    font-size: 1rem;
+    color: #d32f2f;
+    margin-top: 6px;
+}
+
+/* 備考欄 */
+#resMemo {
+    margin-top: 10px;
+    font-size: 1rem;
+}
+
+/* ▼▼▼ 確認ページ専用 CSS（ここまで） ▼▼▼ */
+
     </style>
 </head>
 <body>
@@ -100,16 +187,56 @@
 </div>
 
 <!-- 確認ページ（ここからレイアウトを最終形に） -->
+<!-- 確認ページ -->
 <div id="confirmPage" class="container hidden">
-    <h2>確認ページ</h2>
+    <h2 style="font-size:1.4rem; text-align:center;">確認ページ</h2>
+
     <div id="captureArea">
-        <h2>帰参届</h2>
-        <div id="resSum"></div>
-        <h3 style="margin:6px 0 2px 0; font-size:0.8rem;">食事・宿泊明細</h3>
+        <h2 style="text-align:center; margin:0 0 10px 0; font-size:1.4rem;">帰参届</h2>
+
+        <!-- 教会名〜交通手段の表 -->
+        <table id="infoTable">
+            <tr>
+                <th class="info-label">教会名</th>
+                <td id="cChurch" class="info-value"></td>
+            </tr>
+            <tr>
+                <th class="info-label">帰参者（代表）</th>
+                <td id="cRep" class="info-value"></td>
+            </tr>
+            <tr>
+                <th class="info-label">連絡先</th>
+                <td id="cTel" class="info-value"></td>
+            </tr>
+            <tr>
+                <th class="info-label">人数</th>
+                <td class="info-value">
+                    <div id="cTotal"></div>
+                    <div id="cDetail" style="margin-top:3px;"></div>
+                </td>
+            </tr>
+            <tr>
+                <th class="info-label">到着予定</th>
+                <td id="cArr" class="info-value"></td>
+            </tr>
+            <tr>
+                <th class="info-label">出発予定</th>
+                <td id="cDep" class="info-value"></td>
+            </tr>
+            <tr>
+                <th class="info-label">交通手段</th>
+                <td id="cTrans" class="info-value"></td>
+            </tr>
+        </table>
+
+        <h3 style="margin:12px 0 4px 0; font-size:1.1rem;">食事・宿泊明細</h3>
         <div id="resTable"></div>
+
         <div id="resTicket"></div>
+
         <div id="resMemo"></div>
     </div>
+
     <button class="btn" style="background:#888;" onclick="backEdit()">修正</button>
     <button class="btn" onclick="sendImage()">送信</button>
 </div>
@@ -123,186 +250,226 @@
 </div>
 
 <script>
-    function toggleT(){
-        const v = document.getElementById('trans').value, sub = document.getElementById('subT');
-        sub.innerHTML = "";
-        if(v==='バス') {
-            sub.innerHTML='<select id="busType"><option value="昼行">昼行</option><option value="夜行">夜行</option></select>';
-        } else if(v==='自教会') {
-            sub.innerHTML='<select id="carType"><option value="自家用車">自家用車</option><option value="マイクロバス">マイクロバス</option><option value="観光バス">観光バス</option></select><input type="number" id="carCount" placeholder="台数">';
-        } else if(v==='同乗') {
-            sub.innerHTML='<select id="dSet" onchange="checkOther()"><option value="大教会号">大教会号</option><option value="他教会">他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="他教会名">';
-        } else if(v==='他') {
-            sub.innerHTML='<input type="text" id="otherTrans" placeholder="交通手段">';
-        }
+   /* ▼▼▼ 確認ページ用 JavaScript（ここから） ▼▼▼ */
+
+/* 交通手段のサブ入力切り替え */
+function toggleT(){
+    const v = document.getElementById('trans').value;
+    const sub = document.getElementById('subT');
+    sub.innerHTML = "";
+
+    if(v==='バス') {
+        sub.innerHTML='<select id="busType"><option value="昼行">昼行</option><option value="夜行">夜行</option></select>';
+    } else if(v==='自教会') {
+        sub.innerHTML='<select id="carType"><option value="自家用車">自家用車</option><option value="マイクロバス">マイクロバス</option><option value="観光バス">観光バス</option></select><input type="number" id="carCount" placeholder="台数">';
+    } else if(v==='同乗') {
+        sub.innerHTML='<select id="dSet" onchange="checkOther()"><option value="大教会号">大教会号</option><option value="他教会">他教会</option></select><input type="text" id="otherChurch" class="hidden" placeholder="他教会名">';
+    } else if(v==='他') {
+        sub.innerHTML='<input type="text" id="otherTrans" placeholder="交通手段">';
     }
-    function checkOther(){ 
-        document.getElementById('otherChurch').classList.toggle('hidden', document.getElementById('dSet').value !== '他教会'); 
+}
+
+function checkOther(){ 
+    document.getElementById('otherChurch').classList.toggle('hidden', document.getElementById('dSet').value !== '他教会'); 
+}
+
+/* 食事・宿泊明細の表生成 */
+function genTable(){
+    const s = document.getElementById('arrD').value;
+    const e = document.getElementById('depD').value;
+    if(!s || !e) return;
+
+    let hasChild = document.getElementById('pC').value > 0;
+    let html = `<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>${hasChild?'<th>泊(子)</th>':''}</tr>`;
+
+    let d = new Date(s);
+    let end = new Date(e);
+
+    while(d <= end){
+        html += `<tr>
+            <td>${d.getMonth()+1}/${d.getDate()}</td>
+            <td><input type="number" class="table-input"></td>
+            <td><input type="number" class="table-input"></td>
+            <td><input type="number" class="table-input"></td>
+            <td><input type="number" class="table-input"></td>
+            ${hasChild?'<td><input type="number" class="table-input"></td>':''}
+        </tr>`;
+        d.setDate(d.getDate()+1);
     }
 
-    function genTable(){
-        const s = document.getElementById('arrD').value, e = document.getElementById('depD').value;
-        if(!s||!e) return;
-        let hasChild = document.getElementById('pC').value > 0;
-        let html = `<table><tr><th>日</th><th>朝</th><th>昼</th><th>夕</th><th>泊(大)</th>`+(hasChild?'<th>泊(子)</th>':'')+'</tr>';
-        let d = new Date(s), end = new Date(e);
-        while(d<=end){
-            html += `<tr><td>${d.getMonth()+1}/${d.getDate()}</td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td><td><input type="number" class="table-input" pattern="\\d*"></td>`+(hasChild?'<td><input type="number" class="table-input" pattern="\\d*"></td>':'')+'</tr>';
-            d.setDate(d.getDate()+1);
-        }
-        document.getElementById('dateList').innerHTML = html+'</table>';
-    }
+    document.getElementById('dateList').innerHTML = html + '</table>';
+}
 
-    function buildConfirmTable() {
-        const rows = document.querySelectorAll('#dateList table tr');
-        if (!rows.length) return '';
-        let html = '<table>';
-        rows.forEach((row, index) => {
-            const cells = row.querySelectorAll('td, th');
-            html += '<tr>';
-            cells.forEach((cell, cIndex) => {
-                if (index === 0) {
-                    html += `<th>${cell.innerText}</th>`;
+/* 確認ページ用の表に変換 */
+function buildConfirmTable() {
+    const rows = document.querySelectorAll('#dateList table tr');
+    if (!rows.length) return '';
+
+    let html = '<table>';
+    rows.forEach((row, index) => {
+        const cells = row.querySelectorAll('td, th');
+        html += '<tr>';
+        cells.forEach((cell, cIndex) => {
+            if (index === 0) {
+                html += `<th>${cell.innerText}</th>`;
+            } else {
+                if (cIndex === 0) {
+                    html += `<td>${cell.innerText}</td>`;
                 } else {
-                    if (cIndex === 0) {
-                        html += `<td>${cell.innerText}</td>`;
-                    } else {
-                        const input = cell.querySelector('input');
-                        html += `<td>${(input && input.value) ? input.value : ''}</td>`;
-                    }
+                    const input = cell.querySelector('input');
+                    html += `<td>${(input && input.value) ? input.value : ''}</td>`;
                 }
-            });
-            html += '</tr>';
+            }
         });
-        html += '</table>';
-        return html;
+        html += '</tr>';
+    });
+    html += '</table>';
+    return html;
+}
+
+/* 日付変換 */
+function formatDateJP(ymd) {
+    if (!ymd) return '';
+    const [y,m,d] = ymd.split('-');
+    return `${parseInt(m)}月${parseInt(d)}日`;
+}
+function formatTimeJP(hm) {
+    if (!hm) return '';
+    const [h,m] = hm.split(':');
+    return `${h}時${m}分`;
+}
+
+/* 入力チェック → 確認ページへ */
+function validateAndConfirm(){
+    const req = ['church','repName','tel','arrD','depD','trans'];
+    for(let id of req){ 
+        if(!document.getElementById(id).value){ 
+            alert('※の付いた必須項目をすべて入力してください。'); 
+            return; 
+        } 
     }
 
-    function formatDateJP(ymd) {
-        if (!ymd) return '';
-        const [y,m,d] = ymd.split('-');
-        return `${parseInt(m)}月${parseInt(d)}日`;
+    const vals = {}; 
+    document.querySelectorAll('input, select, textarea').forEach(i => vals[i.id] = i.value);
+
+    /* 交通手段整形 */
+    let transDetail = "";
+    switch (vals.trans) {
+        case "鉄道":
+            transDetail = "鉄道";
+            break;
+        case "バス":
+            transDetail = `バス（${document.getElementById('busType').value}）`;
+            break;
+        case "自教会":
+            transDetail = `自教会・${document.getElementById('carType').value}（${document.getElementById('carCount').value || 0}台）`;
+            break;
+        case "同乗":
+            const dSet = document.getElementById('dSet').value;
+            transDetail = dSet === "他教会"
+                ? `同乗・他教会（${document.getElementById('otherChurch').value}）`
+                : "同乗・大教会号";
+            break;
+        case "他":
+            transDetail = `他・${document.getElementById('otherTrans').value}`;
+            break;
     }
-    function formatTimeJP(hm) {
-        if (!hm) return '';
-        const [h,m] = hm.split(':');
-        return `${h}時${m}分`;
+
+    /* 人数 */
+    const total = (parseInt(vals.pA||0)+parseInt(vals.pC||0)+parseInt(vals.pB||0)) || 0;
+    document.getElementById('cTotal').innerText = `${total}名`;
+    document.getElementById('cDetail').innerText =
+        `（大${vals.pA||0}／子${vals.pC||0}／乳${vals.pB||0}）（男${vals.genderM||0}／女${vals.genderF||0}）`;
+
+    /* 基本情報 */
+    document.getElementById('cChurch').innerText = vals.church;
+    document.getElementById('cRep').innerText = vals.repName;
+    document.getElementById('cTel').innerText = vals.tel;
+    document.getElementById('cArr').innerText = `${formatDateJP(vals.arrD)} ${formatTimeJP(vals.arrT)}`;
+    document.getElementById('cDep').innerText = `${formatDateJP(vals.depD)} ${formatTimeJP(vals.depT)}`;
+    document.getElementById('cTrans').innerText = transDetail;
+
+    /* 食事・宿泊明細 */
+    document.getElementById('resTable').innerHTML = buildConfirmTable();
+
+    /* 直属食券 */
+    if (vals.tDate && vals.tCount) {
+        document.getElementById('resTicket').innerText =
+            `直属食券　${formatDateJP(vals.tDate)}　${vals.tCount}食`;
+    } else {
+        document.getElementById('resTicket').innerText = "";
     }
 
-    function validateAndConfirm(){
-        const req = ['church','repName','tel','arrD','depD','trans'];
-        for(let id of req){ 
-            if(!document.getElementById(id).value){ 
-                alert('※の付いた必須項目をすべて入力してください。'); 
-                return; 
-            } 
-        }
-        const vals = {}; 
-        document.querySelectorAll('input, select, textarea').forEach(i => vals[i.id] = i.value);
+    /* 備考 */
+    document.getElementById('resMemo').innerHTML =
+        `<strong>備考:</strong><br>${(vals.memo || '').replace(/\n/g, '<br>')}`;
 
-        let transDetail = "";
-        switch (vals.trans) {
-            case "鉄道":
-                transDetail = "鉄道";
-                break;
-            case "バス":
-                transDetail = `バス（${document.getElementById('busType').value}）`;
-                break;
-            case "自教会":
-                transDetail = `自教会・${document.getElementById('carType').value}（${document.getElementById('carCount').value || 0}台）`;
-                break;
-            case "同乗":
-                const dSet = document.getElementById('dSet').value;
-                transDetail = dSet === "他教会"
-                    ? `同乗・他教会（${document.getElementById('otherChurch').value}）`
-                    : "同乗・大教会号";
-                break;
-            case "他":
-                transDetail = `他・${document.getElementById('otherTrans').value}`;
-                break;
-        }
+    /* ページ切り替え */
+    document.getElementById('inputPage').classList.add('hidden');
+    document.getElementById('confirmPage').classList.remove('hidden');
+}
 
-        const total = (parseInt(vals.pA||0)+parseInt(vals.pC||0)+parseInt(vals.pB||0)) || 0;
-        const totalLine = `人数　${total}名`;
-        const detailLine = `（大${vals.pA||0}／子${vals.pC||0}／乳${vals.pB||0}）（男${vals.genderM||0}／女${vals.genderF||0}）`;
+/* 修正ボタン */
+function backEdit(){ 
+    document.getElementById('confirmPage').classList.add('hidden');
+    document.getElementById('inputPage').classList.remove('hidden'); 
+}
 
-        const arrStr = `${formatDateJP(vals.arrD)} ${formatTimeJP(vals.arrT)}`;
-        const depStr = `${formatDateJP(vals.depD)} ${formatTimeJP(vals.depT)}`;
+/* 送信 → PNG生成 → 共有 → ポップアップ */
+async function sendImage(){
+    const area = document.getElementById('captureArea');
+    const canvas = await html2canvas(area, { scale: 2, useCORS: true });
 
-        document.getElementById('resSum').innerHTML = `
-            <div class="line"><span class="label">教会名</span>${vals.church}</div>
-            <div class="line"><span class="label">帰参者（代表）</span>${vals.repName}</div>
-            <div class="line"><span class="label">連絡先</span>${vals.tel}</div>
-            <div class="line">${totalLine}</div>
-            <div class="line indent">${detailLine}</div>
-            <div class="line"><span class="label">到着予定</span>${arrStr}</div>
-            <div class="line"><span class="label">出発予定</span>${depStr}</div>
-            <div class="line"><span class="label">交通手段</span>${transDetail}</div>
-        `;
+    if (navigator.share && navigator.canShare) {
+        canvas.toBlob(async (blob) => {
+            const file = new File([blob], 'kisantodoke.png', { type: 'image/png' });
 
-        document.getElementById('resTable').innerHTML = buildConfirmTable();
+            try {
+                await navigator.share({
+                    files: [file],
+                    title: '帰参届',
+                    text: '帰参届の画像です。'
+                });
 
-        const tDate = vals.tDate;
-        const tCount = vals.tCount;
-        if (tDate && tCount) {
-            document.getElementById('resTicket').innerHTML =
-                `直属食券　${formatDateJP(tDate)}　${tCount}食`;
-        } else {
-            document.getElementById('resTicket').innerHTML = '';
-        }
+                askAfterShare();  // ← 共有後のポップアップ
 
-        const memoText = (vals.memo || '').replace(/\n/g, '<br>');
-        document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${memoText}`;
+            } catch (e) {
+                fallbackShow(canvas);
+            }
+        }, 'image/png');
+    } else {
+        fallbackShow(canvas);
+    }
+}
 
-        document.getElementById('inputPage').classList.add('hidden');
+/* 共有後のポップアップ */
+function askAfterShare(){
+    const ok = confirm("詰所または村田さんに送信しましたか？");
+
+    if(ok){
+        location.reload();  // 最初の画面へ
+    } else {
+        document.getElementById('resultPage').classList.add('hidden');
         document.getElementById('confirmPage').classList.remove('hidden');
     }
+}
 
-    function backEdit(){ 
-        document.getElementById('inputPage').classList.remove('hidden'); 
-        document.getElementById('confirmPage').classList.add('hidden'); 
-    }
+/* 共有非対応ブラウザ用 */
+function fallbackShow(canvas) {
+    document.getElementById('confirmPage').classList.add('hidden'); 
+    document.getElementById('resultPage').classList.remove('hidden');
 
-    async function sendImage(){
-        const area = document.getElementById('captureArea');
-        const canvas = await html2canvas(area, { scale: 2, useCORS: true });
+    document.getElementById('imageDisplay').innerHTML =
+        `<img src="${canvas.toDataURL()}" style="width:100%">`;
 
-        if (navigator.share && navigator.canShare) {
-            canvas.toBlob(async (blob) => {
-                if (!blob) {
-                    fallbackShow(canvas);
-                    return;
-                }
-                const file = new File([blob], 'kisantodoke.png', { type: 'image/png' });
-                if (navigator.canShare({ files: [file] })) {
-                    try {
-                        await navigator.share({
-                            files: [file],
-                            title: '帰参届',
-                            text: '帰参届の画像です。'
-                        });
-                    } catch (e) {
-                        fallbackShow(canvas);
-                    }
-                } else {
-                    fallbackShow(canvas);
-                }
-            }, 'image/png');
-        } else {
-            fallbackShow(canvas);
-        }
-    }
+    document.getElementById('method').innerHTML = `
+        画像を長押しして保存し、メールやLINEなどで送信してください。<br>
+        <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
+    `;
+}
 
-    function fallbackShow(canvas) {
-        document.getElementById('confirmPage').classList.add('hidden'); 
-        document.getElementById('resultPage').classList.remove('hidden');
-        document.getElementById('imageDisplay').innerHTML = `<img src="${canvas.toDataURL()}" style="width:100%">`;
-        document.getElementById('method').innerHTML = `
-            <strong>送信方法:</strong><br>
-            画像を長押しして保存し、メールやLINEなどで送信してください。<br>
-            <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
-        `;
-    }
+/* ▼▼▼ 確認ページ用 JavaScript（ここまで） ▼▼▼ */
+
 </script>
 </body>
 </html>
