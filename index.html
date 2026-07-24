@@ -424,31 +424,39 @@ function backEdit(){
     document.getElementById('inputPage').classList.remove('hidden'); 
 }
 
-/* 送信 → PNG生成 → 共有 → ポップアップ */
+    /* 送信 → PNG生成 → 共有 */
 async function sendImage(){
     const area = document.getElementById('captureArea');
+    
+    // 素早くcanvasを作る
     const canvas = await html2canvas(area, { scale: 2, useCORS: true });
 
-    if (navigator.share && navigator.canShare) {
-        canvas.toBlob(async (blob) => {
-            const file = new File([blob], 'kisantodoke.png', { type: 'image/png' });
+    canvas.toBlob(async (blob) => {
+        if (!blob) {
+            alert('画像の作成に失敗しました。');
+            return;
+        }
+        const file = new File([blob], 'kisantodoke.png', { type: 'image/png' });
 
+        // navigator.canShare と navigator.share の安全な実行
+        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
                 await navigator.share({
                     files: [file],
                     title: '帰参届',
                     text: '帰参届です。'
                 });
-
-                askAfterShare();  // ← 共有後のポップアップ
-
+                askAfterShare();
             } catch (e) {
-                fallbackShow(canvas);
+                // ユーザーがキャンセルした場合以外のエラーならフォールバックへ
+                if (e.name !== 'AbortError') {
+                    fallbackShow(canvas);
+                }
             }
-        }, 'image/png');
-    } else {
-        fallbackShow(canvas);
-    }
+        } else {
+            fallbackShow(canvas);
+        }
+    }, 'image/png');
 }
 
 /* 共有後のポップアップ */
