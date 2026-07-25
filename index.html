@@ -424,11 +424,9 @@ function backEdit(){
     document.getElementById('inputPage').classList.remove('hidden'); 
 }
 
-    /* 送信 → PNG生成 → 共有 */
+/* 送信 → PNG生成 → 共有 */
 async function sendImage(){
     const area = document.getElementById('captureArea');
-    
-    // 素早くcanvasを作る
     const canvas = await html2canvas(area, { scale: 2, useCORS: true });
 
     canvas.toBlob(async (blob) => {
@@ -438,22 +436,27 @@ async function sendImage(){
         }
         const file = new File([blob], 'kisantodoke.png', { type: 'image/png' });
 
-        // navigator.canShare と navigator.share の安全な実行
+        // 共有機能が使えそうかチェック
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
+                // AndroidのLINE内ブラウザ対策として、共有が瞬時にスルーされたか判定するためフラグを用意
+                let shared = false;
                 await navigator.share({
                     files: [file],
                     title: '帰参届',
                     text: '帰参届です。'
-                });
-                askAfterShare();
-            } catch (e) {
-                // ユーザーがキャンセルした場合以外のエラーならフォールバックへ
-                if (e.name !== 'AbortError') {
-                    fallbackShow(canvas);
+                }).then(() => { shared = true; }).catch(() => { shared = false; });
+
+                if (shared) {
+                    askAfterShare();
+                } else {
+                    fallbackShow(canvas); // 共有されなかった場合は確実に画像表示へ
                 }
+            } catch (e) {
+                fallbackShow(canvas);
             }
         } else {
+            // 非対応環境（PCや一部Androidブラウザ）は確実に画像表示へ
             fallbackShow(canvas);
         }
     }, 'image/png');
