@@ -250,12 +250,16 @@
     <button class="btn" onclick="sendImage()">送信</button>
 </div>
 
-<!-- 結果ページ（共有非対応ブラウザ用のフォールバック） -->
+    <!-- 結果ページ（保存・送信案内用） -->
 <div id="resultPage" class="container hidden">
-    <h2 id="inst">送信用画像</h2>
-    <div id="imageDisplay" style="text-align:center;"></div>
-    <p id="method" style="font-size:0.8rem;"></p>
-    <button class="btn" onclick="location.reload()">終了</button>
+    <h2 id="inst" style="text-align:center; font-size:1.4rem;">送信用画像</h2>
+    <div id="imageDisplay" style="text-align:center; margin:15px 0;"></div>
+    
+    <!-- ▼ 新しく追加した「画像を保存する」ボタン ▼ -->
+    <a id="downloadBtn" class="btn" style="background:#2e7d32; text-align:center; text-decoration:none; display:block; box-sizing:border-box; margin-bottom:10px;">画像をスマホに保存する</a>
+    
+    <p id="method" style="font-size:0.85rem; line-height:1.5; background:#f1f1f1; padding:10px; border-radius:5px;"></p>
+    <button class="btn" onclick="location.reload()" style="background:#666;">はじめに戻る</button>
 </div>
 
 <script>
@@ -474,16 +478,27 @@ function askAfterShare(){
     }
 }
 
-/* 共有非対応ブラウザ用 */
+    /* 共有非対応ブラウザ・LINE用（画像保存ボタン付き） */
 function fallbackShow(canvas) {
     document.getElementById('confirmPage').classList.add('hidden'); 
     document.getElementById('resultPage').classList.remove('hidden');
 
-    document.getElementById('imageDisplay').innerHTML =
-        `<img src="${canvas.toDataURL()}" style="width:100%">`;
+    const dataURL = canvas.toDataURL('image/png');
 
+    // 画像を表示
+    document.getElementById('imageDisplay').innerHTML =
+        `<img src="${dataURL}" style="width:100%; border:1px solid #ccc; border-radius:5px;">`;
+
+    // 保存ボタンにダウンロード機能を付与
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.href = dataURL;
+    downloadBtn.download = 'kisantodoke.png';
+
+    // わかりやすい案内文を表示
     document.getElementById('method').innerHTML = `
-        帰参届をスクショして保存し、メールやLINEなどで送信してください。<br>
+        <strong>【保存方法】</strong><br>
+        上の<strong>「画像をスマホに保存する」ボタン</strong>を押して写真を保存してください。<br>
+        その後、LINEやメールで送信してください。<br><br>
         <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
     `;
 }
