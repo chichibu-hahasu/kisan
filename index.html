@@ -250,16 +250,23 @@
     <button class="btn" onclick="sendImage()">送信</button>
 </div>
 
-    <!-- 結果ページ（保存・送信案内用） -->
+  <!-- 結果ページ（Android・LINE完全対応版） -->
 <div id="resultPage" class="container hidden">
-    <h2 id="inst" style="text-align:center; font-size:1.4rem;">送信用画像</h2>
+    <h2 id="inst" style="text-align:center; font-size:1.4rem; color:#d32f2f; margin-bottom:5px;">送信用画像ができました</h2>
+    <p style="text-align:center; font-size:0.85rem; color:#333; margin-top:0;">下のボタンを押して画像を保存してください</p>
+    
     <div id="imageDisplay" style="text-align:center; margin:15px 0;"></div>
     
-    <!-- ▼ 新しく追加した「画像を保存する」ボタン ▼ -->
-    <a id="downloadBtn" class="btn" style="background:#2e7d32; text-align:center; text-decoration:none; display:block; box-sizing:border-box; margin-bottom:10px;">画像をスマホに保存する</a>
+    <!-- 画像を開くボタン -->
+    <a id="openImageBtn" class="btn" style="background:#2e7d32; text-align:center; text-decoration:none; display:block; box-sizing:border-box; margin-bottom:10px;">画像を保存画面で開く</a>
     
-    <p id="method" style="font-size:0.85rem; line-height:1.5; background:#f1f1f1; padding:10px; border-radius:5px;"></p>
-    <button class="btn" onclick="location.reload()" style="background:#666;">はじめに戻る</button>
+    <p id="method" style="font-size:0.85rem; line-height:1.5; background:#fff3e0; padding:10px; border-radius:5px; border:1px solid #ffe0b2; color:#e65100;">
+        <strong>【保存方法（Android / LINEの方）】</strong><br>
+        1. 緑色の<strong>「画像を保存画面で開く」</strong>ボタンを押します。<br>
+        2. 画面に画像が表示されたら、保存またはスクリーンショットで保存してください。<br><br>
+        <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
+    </p>
+    <button class="btn" onclick="location.reload()" style="background:#666; margin-top:15px;">はじめに戻る</button>
 </div>
 
 <script>
@@ -478,29 +485,21 @@ function askAfterShare(){
     }
 }
 
-    /* 共有非対応ブラウザ・LINE用（画像保存ボタン付き） */
+/* Android・LINEブラウザ完全対応の画像表示処理 */
 function fallbackShow(canvas) {
     document.getElementById('confirmPage').classList.add('hidden'); 
     document.getElementById('resultPage').classList.remove('hidden');
 
     const dataURL = canvas.toDataURL('image/png');
 
-    // 画像を表示
+    // 画面にプレビューを表示
     document.getElementById('imageDisplay').innerHTML =
-        `<img src="${dataURL}" style="width:100%; border:1px solid #ccc; border-radius:5px;">`;
+        `<img src="${dataURL}" style="width:100%; max-width:280px; border:1px solid #ccc; border-radius:5px;">`;
 
-    // 保存ボタンにダウンロード機能を付与
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.href = dataURL;
-    downloadBtn.download = 'kisantodoke.png';
-
-    // わかりやすい案内文を表示
-    document.getElementById('method').innerHTML = `
-        <strong>【保存方法】</strong><br>
-        上の<strong>「画像をスマホに保存する」ボタン</strong>を押して写真を保存してください。<br>
-        その後、LINEやメールで送信してください。<br><br>
-        <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
-    `;
+    // ボタンに直接データURLをセット
+    const openBtn = document.getElementById('openImageBtn');
+    openBtn.href = dataURL;
+    openBtn.download = 'kisantodoke.png';
 }
 
 /* ▼▼▼ 確認ページ用 JavaScript（ここまで） ▼▼▼ */
