@@ -60,7 +60,8 @@
         }
         #infoTable td.info-value {
             background: #fff;
-            white-space: nowrap;
+            white-space: normal; /* 人数欄などの途切れ防止 */
+            word-break: break-all;
         }
         #resTable table {
             width: 100%;
@@ -76,8 +77,8 @@
         #resTable th:nth-child(n+2), #resTable td:nth-child(n+2) { width: 38px; }
         #resTicket { font-size: 1rem; color: #d32f2f; margin-top: 6px; }
         #resMemo { margin-top: 10px; font-size: 1rem; }
-        #cDetail { font-size: 0.75rem; white-space: nowrap; }
-        #cTrans { font-size: 0.85rem; white-space: nowrap; }
+        #cDetail { font-size: 0.75rem; white-space: normal; } /* 人数詳細の途切れ防止 */
+        #cTrans { font-size: 0.85rem; white-space: normal; }
     </style>
 </head>
 <body>
@@ -173,14 +174,13 @@
     <button class="btn" onclick="sendImage()">送信</button>
 </div>
 
-<!-- 結果ページ（メール送信＆対応版） -->
+<!-- 結果ページ -->
 <div id="resultPage" class="container hidden">
     <h2 id="inst" style="text-align:center; font-size:1.4rem; color:#d32f2f; margin-bottom:5px;">送信用画像ができました</h2>
     <p style="text-align:center; font-size:0.85rem; color:#333; margin-top:0;">下のボタンからメールで送信できます</p>
     
     <div id="imageDisplay" style="text-align:center; margin:15px 0;"></div>
     
-    <!-- ボタン一発でメール起動 -->
     <a id="emailBtn" class="btn" style="background:#2e7d32; text-align:center; text-decoration:none; display:block; box-sizing:border-box; margin-bottom:10px;">メールで送信する（宛先自動入力）</a>
     
     <p id="method" style="font-size:0.85rem; line-height:1.5; background:#fff3e0; padding:10px; border-radius:5px; border:1px solid #ffe0b2; color:#e65100;">
@@ -329,12 +329,8 @@ function backEdit(){
     document.getElementById('inputPage').classList.remove('hidden'); 
 }
 
-/* 送信ボタン（作成中の表示をすぐに出して待ち時間を快適にする） */
 async function sendImage(){
-    // すぐに「作成中...」を表示するために確認ページにメッセージを出すか、少しウェイトを入れる
     const area = document.getElementById('captureArea');
-    
-    // 処理中の見た目にするため少しだけ非同期を挟む
     await new Promise(r => setTimeout(r, 50));
 
     const canvas = await html2canvas(area, { scale: 2, useCORS: true });
@@ -379,7 +375,6 @@ function askAfterShare(){
     }
 }
 
-/* 非対応ブラウザ（Android LINE等）用：プレビュー表示 ＆ メール一発起動 */
 function fallbackShow(canvas) {
     document.getElementById('confirmPage').classList.add('hidden'); 
     document.getElementById('resultPage').classList.remove('hidden');
@@ -389,7 +384,6 @@ function fallbackShow(canvas) {
     document.getElementById('imageDisplay').innerHTML =
         `<img src="${dataURL}" style="width:100%; max-width:280px; border:1px solid #ccc; border-radius:5px;"><p style="font-size:0.8rem; color:#666; margin-top:5px;">※画像を長押しして保存してください</p>`;
 
-    // メールアプリを宛先付きで起動するリンクを設定
     const emailBtn = document.getElementById('emailBtn');
     const mailtoLink = `mailto:chichibu133@gmail.com?subject=${encodeURIComponent('帰参届')}&body=${encodeURIComponent('帰参届の画像を作成しました。\n画像を添付して送信します。')}`;
     emailBtn.href = mailtoLink;
