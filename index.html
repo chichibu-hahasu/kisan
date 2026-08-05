@@ -31,107 +31,58 @@
         input[type="number"].table-input { padding: 5px 0; text-align: center; border: 1px solid #ddd; background: #fff; width: 30px; }
         #resMemo { margin-top: 6px; font-size: 0.75rem; }
         #resTicket { margin-top: 2px; font-size: 0.75rem; color: #d32f2f; }
-/* ▼▼▼ 確認ページ専用 CSS（ここから） ▼▼▼ */
-
-/* 全体のキャプチャ領域を少し細くする */
-#captureArea {
-    width: 300px;
-    margin: auto;
-    padding: 12px;
-    background: #fff;
-    border: 1px solid #000;
-    font-size: 1rem;
-    line-height: 1.5;
-}
-
-/* 教会名〜交通手段の表 */
-#infoTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 10px;
-    font-size: 1rem;
-}
-
-#infoTable th,
-#infoTable td {
-    border: 0.7px solid #000;
-    padding: 2px 4px;
-    vertical-align: top;
-}
-
-/* 左側の項目名セル（薄いグレー） */
-#infoTable th.info-label {
-    background: #e6e6e6;
-    width: 90px;
-    font-weight: bold;
-}
-
-/* 右側の値セル */
-#infoTable td.info-value {
-    background: #fff;
-}
-
-/* 食事・宿泊明細の表（横幅を細く） */
-#resTable table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.9rem;
-}
-
-#resTable th,
-#resTable td {
-    border: 0.7px solid #000;
-    padding: 4px;
-    text-align: center;
-}
-
-/* 列幅を細くして3桁でも切れないように */
-#resTable th:nth-child(1),
-#resTable td:nth-child(1) {
-    width: 55px; /* 日付 */
-}
-#resTable th:nth-child(2),
-#resTable td:nth-child(2),
-#resTable th:nth-child(3),
-#resTable td:nth-child(3),
-#resTable th:nth-child(4),
-#resTable td:nth-child(4),
-#resTable th:nth-child(5),
-#resTable td:nth-child(5),
-#resTable th:nth-child(6),
-#resTable td:nth-child(6) {
-    width: 38px; /* 朝・昼・夕・泊(大)・泊(子) */
-}
-
-/* 直属食券（赤字） */
-#resTicket {
-    font-size: 1rem;
-    color: #d32f2f;
-    margin-top: 6px;
-}
-
-/* 備考欄 */
-#resMemo {
-    margin-top: 10px;
-    font-size: 1rem;
-}
-#cDetail { font-size: 0.75rem; white-space: nowrap; }
-
-
-/* ▼▼▼ 確認ページ専用 CSS（ここまで） ▼▼▼ */
-#infoTable td.info-value {
-    white-space: nowrap;
-}
-#cTrans {
-    font-size: 0.85rem;
-    white-space: nowrap;
-}
-
+        
+        /* 確認ページ専用 CSS */
+        #captureArea {
+            width: 300px;
+            margin: auto;
+            padding: 12px;
+            background: #fff;
+            border: 1px solid #000;
+            font-size: 1rem;
+            line-height: 1.5;
+        }
+        #infoTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+            font-size: 1rem;
+        }
+        #infoTable th, #infoTable td {
+            border: 0.7px solid #000;
+            padding: 2px 4px;
+            vertical-align: top;
+        }
+        #infoTable th.info-label {
+            background: #e6e6e6;
+            width: 90px;
+            font-weight: bold;
+        }
+        #infoTable td.info-value {
+            background: #fff;
+            white-space: nowrap;
+        }
+        #resTable table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+        #resTable th, #resTable td {
+            border: 0.7px solid #000;
+            padding: 4px;
+            text-align: center;
+        }
+        #resTable th:nth-child(1), #resTable td:nth-child(1) { width: 55px; }
+        #resTable th:nth-child(n+2), #resTable td:nth-child(n+2) { width: 38px; }
+        #resTicket { font-size: 1rem; color: #d32f2f; margin-top: 6px; }
+        #resMemo { margin-top: 10px; font-size: 1rem; }
+        #cDetail { font-size: 0.75rem; white-space: nowrap; }
+        #cTrans { font-size: 0.85rem; white-space: nowrap; }
     </style>
 </head>
 <body>
 
-<!-- 認証ページ（変更しない） -->
+<!-- 認証ページ -->
 <div id="authPage">
     <div class="auth-inner">
         <h1 style="font-size:1.2rem;">※教会の許可なく帰参届を提出することはできません。</h1>
@@ -142,7 +93,7 @@
     </div>
 </div>
 
-<!-- 帰参届入力ページ（変更しない） -->
+<!-- 帰参届入力ページ -->
 <div id="inputPage" class="container hidden">
     <h2 class="page-title">帰参届入力</h2>
     <p style="color:red; font-weight:bold;">※は必須項目です。</p>
@@ -154,12 +105,12 @@
     <label><span style="color:red;">*</span>人数</label>
     <div style="display:flex; gap:5px;">
         <input type="number" id="pA" placeholder="大人" oninput="genTable()" inputmode="numeric">
-<input type="number" id="pC" placeholder="子供" oninput="genTable()" inputmode="numeric">
-<input type="number" id="pB" placeholder="乳児" inputmode="numeric">
+        <input type="number" id="pC" placeholder="子供" oninput="genTable()" inputmode="numeric">
+        <input type="number" id="pB" placeholder="乳児" inputmode="numeric">
     </div>
     <div style="display:flex; gap:5px; margin-top:5px;">
         <input type="number" id="genderM" placeholder="男(人数)" inputmode="numeric">
-<input type="number" id="genderF" placeholder="女(人数)" inputmode="numeric">
+        <input type="number" id="genderF" placeholder="女(人数)" inputmode="numeric">
     </div>
     
     <label><span style="color:red;">*</span>詰所到着予定日時</label>
@@ -195,7 +146,6 @@
     <button class="btn" onclick="validateAndConfirm()">確認ページへ</button>
 </div>
 
-<!-- 確認ページ（ここからレイアウトを最終形に） -->
 <!-- 確認ページ -->
 <div id="confirmPage" class="container hidden">
     <h2 style="font-size:1.4rem; text-align:center;">確認ページ</h2>
@@ -203,46 +153,19 @@
     <div id="captureArea">
         <h2 style="text-align:center; margin:0 0 10px 0; font-size:1.4rem;">帰参届</h2>
 
-        <!-- 教会名〜交通手段の表 -->
         <table id="infoTable">
-            <tr>
-                <th class="info-label">教会名</th>
-                <td id="cChurch" class="info-value"></td>
-            </tr>
-            <tr>
-                <th class="info-label">帰参者</th>
-                <td id="cRep" class="info-value"></td>
-            </tr>
-            <tr>
-                <th class="info-label">連絡先</th>
-                <td id="cTel" class="info-value"></td>
-            </tr>
-            <tr>
-                <th class="info-label">人数</th>
-                <td class="info-value">
-                    <div id="cTotal"></div>
-                    <div id="cDetail" style="margin-top:3px;"></div>
-                </td>
-            </tr>
-            <tr>
-                <th class="info-label">到着予定</th>
-                <td id="cArr" class="info-value"></td>
-            </tr>
-            <tr>
-                <th class="info-label">出発予定</th>
-                <td id="cDep" class="info-value"></td>
-            </tr>
-            <tr>
-                <th class="info-label">交通手段</th>
-                <td id="cTrans" class="info-value"></td>
-            </tr>
+            <tr><th class="info-label">教会名</th><td id="cChurch" class="info-value"></td></tr>
+            <tr><th class="info-label">帰参者</th><td id="cRep" class="info-value"></td></tr>
+            <tr><th class="info-label">連絡先</th><td id="cTel" class="info-value"></td></tr>
+            <tr><th class="info-label">人数</th><td class="info-value"><div id="cTotal"></div><div id="cDetail" style="margin-top:3px;"></div></td></tr>
+            <tr><th class="info-label">到着予定</th><td id="cArr" class="info-value"></td></tr>
+            <tr><th class="info-label">出発予定</th><td id="cDep" class="info-value"></td></tr>
+            <tr><th class="info-label">交通手段</th><td id="cTrans" class="info-value"></td></tr>
         </table>
 
         <h3 style="margin:12px 0 4px 0; font-size:1.1rem;">食事・宿泊明細</h3>
         <div id="resTable"></div>
-
         <div id="resTicket"></div>
-
         <div id="resMemo"></div>
     </div>
 
@@ -250,34 +173,30 @@
     <button class="btn" onclick="sendImage()">送信</button>
 </div>
 
-  <!-- 結果ページ（Android・LINE完全対応版） -->
+<!-- 結果ページ（メール送信＆対応版） -->
 <div id="resultPage" class="container hidden">
     <h2 id="inst" style="text-align:center; font-size:1.4rem; color:#d32f2f; margin-bottom:5px;">送信用画像ができました</h2>
-    <p style="text-align:center; font-size:0.85rem; color:#333; margin-top:0;">下のボタンを押して画像を保存してください</p>
+    <p style="text-align:center; font-size:0.85rem; color:#333; margin-top:0;">下のボタンからメールで送信できます</p>
     
     <div id="imageDisplay" style="text-align:center; margin:15px 0;"></div>
     
-    <!-- 画像を開くボタン -->
-    <a id="openImageBtn" class="btn" style="background:#2e7d32; text-align:center; text-decoration:none; display:block; box-sizing:border-box; margin-bottom:10px;">画像を保存画面で開く</a>
+    <!-- ボタン一発でメール起動 -->
+    <a id="emailBtn" class="btn" style="background:#2e7d32; text-align:center; text-decoration:none; display:block; box-sizing:border-box; margin-bottom:10px;">メールで送信する（宛先自動入力）</a>
     
     <p id="method" style="font-size:0.85rem; line-height:1.5; background:#fff3e0; padding:10px; border-radius:5px; border:1px solid #ffe0b2; color:#e65100;">
-        <strong>【保存方法（Android / LINEの方）】</strong><br>
-        1. 緑色の<strong>「画像を保存画面で開く」</strong>ボタンを押します。<br>
-        2. 画面に画像が表示されたら、保存またはスクリーンショットで保存してください。<br><br>
+        <strong>【送信方法】</strong><br>
+        1. 緑色のボタンを押すとメールアプリが立ち上がります。<br>
+        2. 画像を長押しして保存し、メールに添付して送信してください。<br><br>
         <strong>宛先：秩父詰所 chichibu133@gmail.com</strong>
     </p>
     <button class="btn" onclick="location.reload()" style="background:#666; margin-top:15px;">はじめに戻る</button>
 </div>
 
 <script>
-  /* ▼▼▼ 確認ページ用 JavaScript（ここから） ▼▼▼ */
-
-/* 交通手段のサブ入力切り替え */
 function toggleT(){
     const v = document.getElementById('trans').value;
     const sub = document.getElementById('subT');
     sub.innerHTML = "";
-
     if(v==='バス') {
         sub.innerHTML='<select id="busType"><option value="昼行">昼行</option><option value="夜行">夜行</option></select>';
     } else if(v==='自教会') {
@@ -293,7 +212,6 @@ function checkOther(){
     document.getElementById('otherChurch').classList.toggle('hidden', document.getElementById('dSet').value !== '他教会'); 
 }
 
-/* 食事・宿泊明細の表生成 */
 function genTable(){
     const s = document.getElementById('arrD').value;
     const e = document.getElementById('depD').value;
@@ -320,7 +238,6 @@ function genTable(){
     document.getElementById('dateList').innerHTML = html + '</table>';
 }
 
-/* 確認ページ用の表に変換 */
 function buildConfirmTable() {
     const rows = document.querySelectorAll('#dateList table tr');
     if (!rows.length) return '';
@@ -347,7 +264,6 @@ function buildConfirmTable() {
     return html;
 }
 
-/* 日付変換 */
 function formatDateJP(ymd) {
     if (!ymd) return '';
     const [y,m,d] = ymd.split('-');
@@ -359,7 +275,6 @@ function formatTimeJP(hm) {
     return `${h}時${m}分`;
 }
 
-/* 入力チェック → 確認ページへ */
 function validateAndConfirm(){
     const req = ['church','repName','tel','arrD','depD','trans'];
     for(let id of req){ 
@@ -372,36 +287,22 @@ function validateAndConfirm(){
     const vals = {}; 
     document.querySelectorAll('input, select, textarea').forEach(i => vals[i.id] = i.value);
 
-    /* 交通手段整形 */
     let transDetail = "";
     switch (vals.trans) {
-        case "鉄道":
-            transDetail = "鉄道";
-            break;
-        case "バス":
-            transDetail = `バス（${document.getElementById('busType').value}）`;
-            break;
-        case "自教会":
-            transDetail = `自教会・${document.getElementById('carType').value}（${document.getElementById('carCount').value || 0}台）`;
-            break;
+        case "鉄道": transDetail = "鉄道"; break;
+        case "バス": transDetail = `バス（${document.getElementById('busType').value}）`; break;
+        case "自教会": transDetail = `自教会・${document.getElementById('carType').value}（${document.getElementById('carCount').value || 0}台）`; break;
         case "同乗":
             const dSet = document.getElementById('dSet').value;
-            transDetail = dSet === "他教会"
-                ? `同乗・他教会（${document.getElementById('otherChurch').value}）`
-                : "同乗・大教会号";
+            transDetail = dSet === "他教会" ? `同乗・他教会（${document.getElementById('otherChurch').value}）` : "同乗・大教会号";
             break;
-        case "他":
-            transDetail = `他・${document.getElementById('otherTrans').value}`;
-            break;
+        case "他": transDetail = `他・${document.getElementById('otherTrans').value}`; break;
     }
 
-    /* 人数 */
     const total = (parseInt(vals.pA||0)+parseInt(vals.pC||0)+parseInt(vals.pB||0)) || 0;
     document.getElementById('cTotal').innerText = `${total}名`;
-    document.getElementById('cDetail').innerText =
-        `（大${vals.pA||0}／子${vals.pC||0}／乳${vals.pB||0}）（男${vals.genderM||0}／女${vals.genderF||0}）`;
+    document.getElementById('cDetail').innerText = `（大${vals.pA||0}／子${vals.pC||0}／乳${vals.pB||0}）（男${vals.genderM||0}／女${vals.genderF||0}）`;
 
-    /* 基本情報 */
     document.getElementById('cChurch').innerText = vals.church;
     document.getElementById('cRep').innerText = vals.repName;
     document.getElementById('cTel').innerText = vals.tel;
@@ -409,35 +310,33 @@ function validateAndConfirm(){
     document.getElementById('cDep').innerText = `${formatDateJP(vals.depD)} ${formatTimeJP(vals.depT)}`;
     document.getElementById('cTrans').innerText = transDetail;
 
-    /* 食事・宿泊明細 */
     document.getElementById('resTable').innerHTML = buildConfirmTable();
 
-    /* 直属食券 */
     if (vals.tDate && vals.tCount) {
-        document.getElementById('resTicket').innerText =
-            `直属食券　${formatDateJP(vals.tDate)}　${vals.tCount}食`;
+        document.getElementById('resTicket').innerText = `直属食券　${formatDateJP(vals.tDate)}　${vals.tCount}食`;
     } else {
         document.getElementById('resTicket').innerText = "";
     }
 
-    /* 備考 */
-    document.getElementById('resMemo').innerHTML =
-        `<strong>備考:</strong><br>${(vals.memo || '').replace(/\n/g, '<br>')}`;
+    document.getElementById('resMemo').innerHTML = `<strong>備考:</strong><br>${(vals.memo || '').replace(/\n/g, '<br>')}`;
 
-    /* ページ切り替え */
     document.getElementById('inputPage').classList.add('hidden');
     document.getElementById('confirmPage').classList.remove('hidden');
 }
 
-/* 修正ボタン */
 function backEdit(){ 
     document.getElementById('confirmPage').classList.add('hidden');
     document.getElementById('inputPage').classList.remove('hidden'); 
 }
 
-/* 送信 → PNG生成 → 共有 */
+/* 送信ボタン（作成中の表示をすぐに出して待ち時間を快適にする） */
 async function sendImage(){
+    // すぐに「作成中...」を表示するために確認ページにメッセージを出すか、少しウェイトを入れる
     const area = document.getElementById('captureArea');
+    
+    // 処理中の見た目にするため少しだけ非同期を挟む
+    await new Promise(r => setTimeout(r, 50));
+
     const canvas = await html2canvas(area, { scale: 2, useCORS: true });
 
     canvas.toBlob(async (blob) => {
@@ -447,10 +346,8 @@ async function sendImage(){
         }
         const file = new File([blob], 'kisantodoke.png', { type: 'image/png' });
 
-        // 共有機能が使えそうかチェック
         if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
             try {
-                // AndroidのLINE内ブラウザ対策として、共有が瞬時にスルーされたか判定するためフラグを用意
                 let shared = false;
                 await navigator.share({
                     files: [file],
@@ -461,50 +358,42 @@ async function sendImage(){
                 if (shared) {
                     askAfterShare();
                 } else {
-                    fallbackShow(canvas); // 共有されなかった場合は確実に画像表示へ
+                    fallbackShow(canvas);
                 }
             } catch (e) {
                 fallbackShow(canvas);
             }
         } else {
-            // 非対応環境（PCや一部Androidブラウザ）は確実に画像表示へ
             fallbackShow(canvas);
         }
     }, 'image/png');
 }
 
-/* 共有後のポップアップ */
 function askAfterShare(){
     const ok = confirm("詰所または村田さんに送信しましたか？");
-
     if(ok){
-        location.reload();  // 最初の画面へ
+        location.reload();
     } else {
         document.getElementById('resultPage').classList.add('hidden');
         document.getElementById('confirmPage').classList.remove('hidden');
     }
 }
 
-/* Android・LINEブラウザ完全対応の画像表示処理 */
+/* 非対応ブラウザ（Android LINE等）用：プレビュー表示 ＆ メール一発起動 */
 function fallbackShow(canvas) {
     document.getElementById('confirmPage').classList.add('hidden'); 
     document.getElementById('resultPage').classList.remove('hidden');
 
     const dataURL = canvas.toDataURL('image/png');
 
-    // 画面にプレビューを表示
     document.getElementById('imageDisplay').innerHTML =
-        `<img src="${dataURL}" style="width:100%; max-width:280px; border:1px solid #ccc; border-radius:5px;">`;
+        `<img src="${dataURL}" style="width:100%; max-width:280px; border:1px solid #ccc; border-radius:5px;"><p style="font-size:0.8rem; color:#666; margin-top:5px;">※画像を長押しして保存してください</p>`;
 
-    // ボタンに直接データURLをセット
-    const openBtn = document.getElementById('openImageBtn');
-    openBtn.href = dataURL;
-    openBtn.download = 'kisantodoke.png';
+    // メールアプリを宛先付きで起動するリンクを設定
+    const emailBtn = document.getElementById('emailBtn');
+    const mailtoLink = `mailto:chichibu133@gmail.com?subject=${encodeURIComponent('帰参届')}&body=${encodeURIComponent('帰参届の画像を作成しました。\n画像を添付して送信します。')}`;
+    emailBtn.href = mailtoLink;
 }
-
-/* ▼▼▼ 確認ページ用 JavaScript（ここまで） ▼▼▼ */
-
-
 </script>
 </body>
 </html>
